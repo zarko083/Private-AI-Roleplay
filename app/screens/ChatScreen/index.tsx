@@ -15,6 +15,7 @@ import SettingsDrawer from '@components/views/SettingsDrawer'
 import { Characters } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
 import { Logger } from '@lib/state/Logger'
+import { Theme } from '@lib/theme/ThemeManager'
 import { ChatImportSchema } from '@lib/utils/ChatSchema'
 import { FileUtils } from '@lib/utils/File'
 import ChatInput from '@screens/ChatScreen/ChatInput'
@@ -23,10 +24,13 @@ import ChatWindow from '@screens/ChatScreen/ChatWindow'
 
 import AuthorNoteSheet from './AuthorNote'
 import AuthorNoteEditor from './AuthorNote/AuthorNoteEditor'
+import ChatIdentityBar from './ChatIdentityBar'
 import ChatEditor from './ChatWindow/ChatEditor'
 
+/** Private roleplay layout: visible character identity + model state + original chat engine. */
 const ChatScreen = () => {
     const { t } = useTranslation()
+    const { color } = Theme.useTheme()
     const insets = useSafeAreaInsets()
     const { unloadCharacter, charId } = Characters.useCharacterStore(
         useShallow((state) => ({
@@ -37,15 +41,12 @@ const ChatScreen = () => {
     const userId = Characters.useUserStore(useShallow((state) => state.id))
 
     const { height } = useReanimatedKeyboardAnimation()
-    const animatedStyle = useAnimatedStyle(() => {
-        return {
-            paddingBottom: -height.value - insets.bottom,
-            flex: 1,
-        }
-    })
+    const animatedStyle = useAnimatedStyle(() => ({
+        paddingBottom: -height.value - insets.bottom,
+        flex: 1,
+    }))
 
     const { chatId, setId, resetId, scrollData } = Chats.useChat()
-
     const { showSettings, showChats } = Drawer.useDrawerStore(
         useShallow((state) => ({
             showSettings: state.values?.[Drawer.ID.SETTINGS],
@@ -62,8 +63,8 @@ const ChatScreen = () => {
 
     const handleCreateChat = async () => {
         if (charId)
-            Chats.db.mutate.createChat(charId).then((chatId) => {
-                if (chatId) setId(chatId)
+            Chats.db.mutate.createChat(charId).then((newChatId) => {
+                if (newChatId) setId(newChatId)
             })
     }
 
@@ -92,73 +93,60 @@ const ChatScreen = () => {
             message.attachments = []
             return message
         })
-
         if (chat.user_id) {
             const userExists = await Characters.db.query.card(chat.user_id)
-            if (!userExists) {
-                chat.user_id = null
-            }
+            if (!userExists) chat.user_id = null
         }
         chat.last_modified = Date.now()
         Chats.db.mutate.cloneChat(chat)
     }
 
-    const renderHeaderButtonRight = () => {
-        return (
-            !showSettings && (
-                <>
-                    {!showChats ? (
-                        <ThemedButton
-                            buttonStyle={{
-                                marginRight: 16,
-                            }}
-                            iconName="plus"
-                            variant="tertiary"
-                            iconSize={24}
-                            onPress={handleCreateChat}
-                        />
-                    ) : (
-                        <ThemedButton
-                            buttonStyle={{
-                                marginRight: 16,
-                            }}
-                            iconName="upload"
-                            variant="tertiary"
-                            iconSize={20}
-                            onPress={handleImportChat}
-                        />
-                    )}
-                    <Drawer.Button drawerID={Drawer.ID.CHATLIST} openIcon="message" />
-                </>
-            )
+    const renderHeaderButtonRight = () =>
+        !showSettings && (
+            <>
+                {!showChats ? (
+                    <ThemedButton
+                        buttonStyle={{ marginRight: 16 }}
+                        iconName="plus"
+                        variant="tertiary"
+                        iconSize={24}
+                        onPress={handleCreateChat}
+                    />
+                ) : (
+                    <ThemedButton
+                        buttonStyle={{ marginRight: 16 }}
+                        iconName="upload"
+                        variant="tertiary"
+                        iconSize={20}
+                        onPress={handleImportChat}
+                    />
+                )}
+                <Drawer.Button drawerID={Drawer.ID.CHATLIST} openIcon="message" />
+            </>
         )
-    }
 
-    const renderHeaderButtonLeft = () => {
-        return !showChats && <Drawer.Button drawerID={Drawer.ID.SETTINGS} />
-    }
+    const renderHeaderButtonLeft = () =>
+        !showChats && <Drawer.Button drawerID={Drawer.ID.SETTINGS} />
 
     return (
         <Drawer.Gesture
             config={[
-                {
-                    drawerID: Drawer.ID.CHATLIST,
-                    openDirection: 'left',
-                    closeDirection: 'right',
-                },
-                {
-                    drawerID: Drawer.ID.SETTINGS,
-                    openDirection: 'right',
-                    closeDirection: 'left',
-                },
+                { drawerID: Drawer.ID.CHATLIST, openDirection: 'left', closeDirection: 'right' },
+                { drawerID: Drawer.ID.SETTINGS, openDirection: 'right', closeDirection: 'left' },
             ]}>
-            <View style={{ flex: 1, paddingBottom: insets.bottom + 4 }}>
+            <View
+                style={{
+                    flex: 1,
+                    backgroundColor: color.neutral._100,
+                    paddingBottom: insets.bottom + 4,
+                }}>
                 <Animated.View style={animatedStyle}>
                     <HeaderTitle />
                     <HeaderButton
                         headerLeft={renderHeaderButtonLeft}
                         headerRight={renderHeaderButtonRight}
                     />
+                    {!showSettings && !showChats && <ChatIdentityBar />}
                     <View style={{ flex: 1 }}>
                         {typeof chatId === 'number' && (
                             <ChatWindow chatId={chatId} scrollData={scrollData} />
@@ -170,8 +158,6 @@ const ChatScreen = () => {
                         <AuthorNoteEditor />
                     </View>
                 </Animated.View>
-
-                {/**Drawer has to be outside of the KeyboardAvoidingView */}
                 <SettingsDrawer />
                 <ChatsDrawer />
             </View>
