@@ -5,15 +5,9 @@ import { launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from 'ex
 import { router } from 'expo-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Keyboard, Pressable, TextInput, TouchableOpacity, View } from 'react-native'
+import { Keyboard, Pressable, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
-import Animated, {
-    BounceIn,
-    FadeIn,
-    FadeOut,
-    LinearTransition,
-    ZoomOut,
-} from 'react-native-reanimated'
+import Animated from 'react-native-reanimated'
 import { create } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -22,7 +16,6 @@ import Alert from '@components/views/Alert'
 import { useBottomSheetRef } from '@components/views/BottomSheet'
 import CameraSheet from '@components/views/CameraSheet'
 import ContextMenu from '@components/views/ContextMenu'
-import { XAxisOnlyTransition } from '@lib/animations/transitions'
 import { AppSettings } from '@lib/constants/GlobalValues'
 import { generateResponse } from '@lib/engine/Inference'
 import { useActiveProvider } from '@lib/hooks/ActiveProvider'
@@ -49,19 +42,19 @@ type ChatInputHeightStoreProps = {
 }
 
 export const useInputHeightStore = create<ChatInputHeightStoreProps>()((set) => ({
-    height: 54,
+    height: 70,
     setHeight: (n) => set({ height: Math.ceil(n) }),
 }))
 
+/** Private Roleplay composer. Original send / regenerate / attachment paths are preserved. */
 const ChatInput = () => {
     const { t } = useTranslation()
     const inputRef = useUnfocusTextInput()
     const { available: activeProvider, mode } = useActiveProvider()
-    const { color, borderRadius, spacing } = Theme.useTheme()
+    const { color } = Theme.useTheme()
     const [sendOnEnter] = useMMKVBoolean(AppSettings.SendOnEnter)
     const [disableSend, setDisableSend] = useState(false)
     const [attachments, setAttachments] = useState<Attachment[]>([])
-    const [hideOptions, setHideOptions] = useState(false)
     const cameraSheetRef = useBottomSheetRef()
     const { nowGenerating, abortFunction } = useInference(
         useShallow((state) => ({
@@ -70,24 +63,11 @@ const ChatInput = () => {
         }))
     )
     const setHeight = useInputHeightStore(useShallow((state) => state.setHeight))
-
-    const { charName } = Characters.useCharacterStore(
-        useShallow((state) => ({
-            charName: state?.card?.name,
-        }))
-    )
-
+    const charName = Characters.useCharacterStore((state) => state.card?.name)
     const { chatId } = Chats.useChat()
-
-    const { userName } = Characters.useUserStore(
-        useShallow((state) => ({ userName: state.card?.name }))
-    )
-
+    const userName = Characters.useUserStore((state) => state.card?.name)
     const { newMessage, setNewMessage } = useChatInputTextStore(
-        useShallow((state) => ({
-            newMessage: state.text,
-            setNewMessage: state.setText,
-        }))
+        useShallow((state) => ({ newMessage: state.text, setNewMessage: state.setText }))
     )
 
     const abortResponse = async () => {
@@ -122,30 +102,22 @@ const ChatInput = () => {
     }
 
     const handlePickImage = async () => {
-        const permissionResult = await requestMediaLibraryPermissionsAsync()
-
-        if (!permissionResult.granted) {
+        const permission = await requestMediaLibraryPermissionsAsync()
+        if (!permission.granted) {
             Alert.alert({
                 title: t('common.errors.permissionRequired'),
                 description: t('chat.input.errors.permissionDescription'),
-                buttons: [
-                    {
-                        label: t('common.actions.close'),
-                    },
-                ],
+                buttons: [{ label: t('common.actions.close') }],
             })
             return
         }
-
-        let result = await launchImageLibraryAsync({
+        const result = await launchImageLibraryAsync({
             mediaTypes: ['images'],
             allowsMultipleSelection: true,
             aspect: [4, 3],
             quality: 1,
         })
-
         if (result.canceled) return
-
         const newAttachments = result.assets
             .map((item) => ({
                 uri: item.uri,
@@ -153,237 +125,178 @@ const ChatInput = () => {
                 name: item.fileName,
             }))
             .filter((item) => !attachments.some((a) => a.name === item.name)) as Attachment[]
-
-        return setAttachments([...attachments, ...newAttachments])
+        setAttachments([...attachments, ...newAttachments])
     }
 
     return (
         <Pressable
             onPress={() => {
                 if (activeProvider) return
-                if (mode === 'local') {
-                    router.push('/screens/ModelManagerScreen')
-                } else router.push('/screens/ConnectionsManagerScreen')
+                router.push(
+                    mode === 'local'
+                        ? '/screens/ModelManagerScreen'
+                        : '/screens/ConnectionsManagerScreen'
+                )
             }}
-            onLayout={(e) => {
-                setHeight(e.nativeEvent.layout.height)
-            }}
+            onLayout={(e) => setHeight(e.nativeEvent.layout.height)}
             disabled={activeProvider}
             style={{
                 position: 'absolute',
-                width: '98%',
+                width: '96%',
                 alignSelf: 'center',
-                bottom: 4,
-                paddingVertical: spacing.sm,
-                paddingHorizontal: spacing.sm,
-                backgroundColor: color.neutral._100 + 'cc',
+                bottom: 6,
+                padding: 10,
+                backgroundColor: color.neutral._200,
                 borderWidth: 1,
-                borderColor: color.neutral._200,
-                boxShadow: [
-                    {
-                        offsetX: 1,
-                        offsetY: 1,
-                        color: color.shadow,
-                        spreadDistance: 1,
-                        blurRadius: 4,
-                    },
-                ],
-                borderRadius: 16,
-                rowGap: spacing.m,
+                borderColor: color.neutral._400,
+                borderRadius: 21,
+                rowGap: 8,
             }}>
-            <Animated.FlatList
-                itemLayoutAnimation={LinearTransition}
+            <Text
                 style={{
-                    display: attachments.length > 0 ? 'flex' : 'none',
-                    padding: spacing.l,
-                    backgroundColor: color.neutral._200,
-                    borderRadius: borderRadius.m,
-                }}
-                horizontal
-                contentContainerStyle={{ columnGap: spacing.xl }}
-                data={attachments}
-                keyExtractor={(item) => item.uri}
-                renderItem={({ item }) => {
-                    return (
-                        <Animated.View
-                            entering={BounceIn}
-                            exiting={ZoomOut.duration(100)}
-                            style={{ alignItems: 'center', rowGap: 8 }}>
+                    color: activeProvider ? color.text._500 : color.primary._800,
+                    fontSize: 10,
+                    fontWeight: '800',
+                    letterSpacing: 1.3,
+                    marginLeft: 6,
+                }}>
+                {activeProvider ? 'YOUR NEXT SCENE' : 'CHOOSE A MODEL TO START CHATTING'}
+            </Text>
+
+            {attachments.length > 0 && (
+                <Animated.FlatList
+                    horizontal
+                    data={attachments}
+                    keyExtractor={(item) => item.uri}
+                    contentContainerStyle={{ columnGap: 10, paddingHorizontal: 6 }}
+                    renderItem={({ item }) => (
+                        <View>
                             <Image
                                 source={{ uri: item.uri }}
                                 style={{
-                                    width: 128,
-                                    height: undefined,
-                                    aspectRatio: 1,
-                                    borderRadius: borderRadius.m,
+                                    width: 76,
+                                    height: 76,
+                                    borderRadius: 12,
                                     borderWidth: 1,
-                                    borderColor: color.primary._500,
+                                    borderColor: color.primary._400,
                                 }}
                             />
-
                             <ThemedButton
                                 iconName="close"
-                                iconSize={20}
+                                iconSize={17}
                                 buttonStyle={{
-                                    borderWidth: 0,
-                                    paddingHorizontal: 2,
-                                    paddingVertical: 2,
                                     position: 'absolute',
                                     alignSelf: 'flex-end',
-                                    margin: -8,
+                                    margin: -5,
                                     backgroundColor: color.neutral._500,
+                                    borderRadius: 25,
+                                    paddingHorizontal: 2,
+                                    paddingVertical: 2,
                                 }}
-                                onPress={() => {
+                                onPress={() =>
                                     setAttachments(attachments.filter((a) => a.uri !== item.uri))
-                                }}
+                                }
                             />
-                        </Animated.View>
-                    )
-                }}
-            />
+                        </View>
+                    )}
+                />
+            )}
             <CameraSheet
-                onTakePicture={(picture) => {
-                    setAttachments((attachments) => [
-                        ...attachments,
-                        {
-                            name: randomUUID().toString(),
-                            uri: picture.uri,
-                            type: 'image',
-                        },
-                    ])
-                }}
                 ref={cameraSheetRef}
+                onTakePicture={(picture) =>
+                    setAttachments((current) => [
+                        ...current,
+                        { name: randomUUID().toString(), uri: picture.uri, type: 'image' },
+                    ])
+                }
             />
-            <View
-                style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    columnGap: spacing.m,
-                }}>
-                <Animated.View layout={XAxisOnlyTransition}>
-                    {!hideOptions && (
-                        <Animated.View
-                            entering={FadeIn}
-                            exiting={FadeOut}
-                            style={{
-                                flexDirection: 'row',
-                                columnGap: 8,
-                                alignItems: 'center',
-                            }}>
-                            <ChatOptions disabled={!activeProvider} />
-                            <ContextMenu
-                                disabled={!activeProvider}
-                                triggerIcon="paper-clip"
-                                triggerIconSize={20}
-                                buttons={[
-                                    {
-                                        label: t('chat.input.actions.takePicture'),
-                                        icon: 'camera',
-                                        onPress: (close) => {
-                                            cameraSheetRef.current?.open()
-                                            close()
-                                        },
-                                    },
-                                    {
-                                        label: t('chat.input.actions.addImage'),
-                                        icon: 'picture',
-                                        onPress: async (close) => {
-                                            close()
-                                            handlePickImage()
-                                        },
-                                    },
-                                ]}
-                                triggerStyle={{
-                                    color: color.text._400,
-                                    padding: 6,
-                                    backgroundColor: color.neutral._200,
-                                    borderRadius: 16,
-                                    opacity: activeProvider ? 1 : 0.5,
-                                }}
-                                placement="top"
-                            />
-                        </Animated.View>
-                    )}
-                    {hideOptions && (
-                        <Animated.View entering={FadeIn} exiting={FadeOut}>
-                            <ThemedButton
-                                iconSize={18}
-                                iconStyle={{
-                                    color: color.text._400,
-                                }}
-                                buttonStyle={{
-                                    padding: 5,
-                                    backgroundColor: color.neutral._200,
-                                    borderRadius: 32,
-                                }}
-                                variant="tertiary"
-                                iconName="right"
-                                onPress={() => setHideOptions(false)}
-                            />
-                        </Animated.View>
-                    )}
-                </Animated.View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', columnGap: 8 }}>
+                <ChatOptions disabled={!activeProvider} />
+                <ContextMenu
+                    disabled={!activeProvider}
+                    triggerIcon="paper-clip"
+                    triggerIconSize={19}
+                    triggerStyle={{
+                        color: color.text._400,
+                        padding: 8,
+                        backgroundColor: color.neutral._300,
+                        borderRadius: 15,
+                        opacity: activeProvider ? 1 : 0.5,
+                    }}
+                    placement="top"
+                    buttons={[
+                        {
+                            label: t('chat.input.actions.takePicture'),
+                            icon: 'camera',
+                            onPress: (close) => {
+                                cameraSheetRef.current?.open()
+                                close()
+                            },
+                        },
+                        {
+                            label: t('chat.input.actions.addImage'),
+                            icon: 'picture',
+                            onPress: (close) => {
+                                close()
+                                handlePickImage()
+                            },
+                        },
+                    ]}
+                />
                 <AnimatedTextInput
-                    layout={XAxisOnlyTransition}
                     ref={inputRef}
                     style={{
                         color: color.text._100,
                         backgroundColor: color.neutral._100,
                         flex: 1,
-                        borderWidth: 2,
-                        borderColor: activeProvider ? color.primary._300 : color.primary._100,
-                        borderRadius: borderRadius.l,
-                        paddingHorizontal: spacing.m,
-                        paddingVertical: spacing.m,
-                    }}
-                    onPress={() => {
-                        setHideOptions(!!newMessage)
+                        minHeight: 44,
+                        maxHeight: 150,
+                        borderWidth: 1,
+                        borderColor: activeProvider ? color.primary._300 : color.neutral._400,
+                        borderRadius: 16,
+                        paddingHorizontal: 12,
+                        paddingVertical: 9,
+                        fontSize: 14,
                     }}
                     numberOfLines={8}
                     placeholder={
                         activeProvider
-                            ? t('chat.input.message')
+                            ? 'Write your next message...'
                             : mode === 'local'
-                              ? t('chat.input.noModelLoaded')
-                              : t('chat.input.noConnection')
+                              ? 'Tap to load a local model'
+                              : 'Tap to connect a provider'
                     }
                     editable={activeProvider}
                     placeholderTextColor={color.text._700}
                     value={newMessage}
-                    onChangeText={(text) => {
-                        setHideOptions(!!text)
-                        setNewMessage(text)
-                    }}
+                    onChangeText={setNewMessage}
                     multiline
                     submitBehavior={sendOnEnter ? 'blurAndSubmit' : 'newline'}
                     onSubmitEditing={sendOnEnter ? handleSend : undefined}
                 />
-                <Animated.View layout={XAxisOnlyTransition}>
-                    <TouchableOpacity
-                        disabled={disableSend || !chatId || !activeProvider}
-                        style={{
-                            borderRadius: borderRadius.m,
-                            backgroundColor: !activeProvider
-                                ? color.neutral._100
-                                : nowGenerating
-                                  ? color.error._500
-                                  : color.primary._500,
-                            padding: spacing.s,
-                            borderWidth: 2,
-                            borderColor: !activeProvider
-                                ? color.primary._100
-                                : nowGenerating
-                                  ? color.error._500
-                                  : color.primary._500,
-                        }}
-                        onPress={nowGenerating ? abortResponse : handleSend}>
-                        <MaterialIcons
-                            name={nowGenerating ? 'stop' : 'send'}
-                            color={activeProvider ? color.neutral._100 : color.text._700}
-                            size={24}
-                        />
-                    </TouchableOpacity>
-                </Animated.View>
+                <TouchableOpacity
+                    accessibilityRole="button"
+                    accessibilityLabel={nowGenerating ? 'Stop generation' : 'Send message'}
+                    disabled={disableSend || !chatId || !activeProvider}
+                    style={{
+                        width: 45,
+                        height: 45,
+                        borderRadius: 15,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: !activeProvider
+                            ? color.neutral._300
+                            : nowGenerating
+                              ? color.error._500
+                              : color.primary._500,
+                    }}
+                    onPress={nowGenerating ? abortResponse : handleSend}>
+                    <MaterialIcons
+                        name={nowGenerating ? 'stop' : 'send'}
+                        color={activeProvider ? color.neutral._100 : color.text._700}
+                        size={23}
+                    />
+                </TouchableOpacity>
             </View>
         </Pressable>
     )
