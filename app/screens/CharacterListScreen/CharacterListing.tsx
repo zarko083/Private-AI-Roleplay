@@ -1,3 +1,4 @@
+import { LinearGradient } from 'expo-linear-gradient'
 import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
@@ -8,7 +9,6 @@ import { AppSettings } from '@lib/constants/GlobalValues'
 import { Characters, CharInfo } from '@lib/state/Characters'
 import { CharacterSorter } from '@lib/state/CharacterSorter'
 import { Theme } from '@lib/theme/ThemeManager'
-import { getFriendlyTimeStamp } from '@lib/utils/Time'
 
 import CharacterEditPopup from './CharacterEditPopup'
 import CharacterListingTags from './CharacterListingTags'
@@ -19,6 +19,7 @@ type CharacterListingProps = {
     setNowLoading: (b: boolean) => void
 }
 
+/** Poster-style character card; original tap/long-press action is retained. */
 const CharacterListing: React.FC<CharacterListingProps> = ({
     character,
     nowLoading,
@@ -34,12 +35,11 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
         }))
     )
     const styles = useStyles()
-
-    const getPreviewText = () => {
-        if (character.latestSwipe === undefined || !character.latestName)
-            return t('character.list.emptyStates.noMessages')
-        return character.latestName + ': ' + character.latestSwipe.trim()
-    }
+    const { color } = Theme.useTheme()
+    const hasChat = character.latestSwipe !== undefined && Boolean(character.latestName)
+    const preview = hasChat
+        ? `${character.latestName}: ${character.latestSwipe?.trim() ?? ''}`
+        : t('character.list.emptyStates.noMessages')
 
     return (
         <View style={{ flex: 1 }}>
@@ -53,17 +53,23 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
                         style={styles.cover}
                         contentFit="cover"
                     />
-                    <View style={styles.info}>
-                        <Text style={styles.name} numberOfLines={1}>
+                    <LinearGradient
+                        colors={['transparent', 'rgba(9, 7, 18, 0.65)', 'rgba(9, 7, 18, 0.99)']}
+                        locations={[0, 0.38, 1]}
+                        style={styles.gradient}>
+                        <Text style={styles.name} numberOfLines={2}>
                             {character.name}
                         </Text>
-                        <Text style={styles.preview} numberOfLines={2} ellipsizeMode="tail">
-                            {getPreviewText()}
+                        <Text style={styles.preview} numberOfLines={2}>
+                            {preview}
                         </Text>
-                        <Text style={styles.timestamp} numberOfLines={1}>
-                            {getFriendlyTimeStamp(character.last_modified)}
-                        </Text>
-                    </View>
+                        <View style={styles.bottomRow}>
+                            <Text style={styles.action} numberOfLines={1}>
+                                {hasChat ? 'CONTINUE STORY' : 'START STORY'}
+                            </Text>
+                            <Text style={{ color: color.primary._900, fontSize: 18 }}>›</Text>
+                        </View>
+                    </LinearGradient>
                 </View>
             </CharacterEditPopup>
             <CharacterListingTags
@@ -87,38 +93,54 @@ const useStyles = () => {
     return StyleSheet.create({
         card: {
             overflow: 'hidden',
-            borderRadius: 18,
+            borderRadius: 20,
             borderWidth: 1,
             borderColor: color.neutral._400,
             backgroundColor: color.neutral._200,
         },
         cover: {
             width: '100%',
-            aspectRatio: 0.94,
+            aspectRatio: 0.68,
             backgroundColor: color.neutral._300,
         },
-        info: {
-            minHeight: 110,
-            paddingHorizontal: 12,
-            paddingTop: 12,
-            paddingBottom: 14,
+        gradient: {
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            paddingHorizontal: 13,
+            paddingTop: 80,
+            paddingBottom: 13,
+            justifyContent: 'flex-end',
         },
         name: {
-            fontSize: 16,
-            fontWeight: '700',
-            color: color.text._100,
+            color: '#FFFFFF',
+            fontSize: 17,
+            fontWeight: '800',
+            letterSpacing: -0.3,
         },
         preview: {
-            fontSize: 12,
-            color: color.text._400,
-            lineHeight: 18,
-            marginTop: 6,
-            minHeight: 36,
+            color: '#D3CEDD',
+            marginTop: 5,
+            fontSize: 11,
+            lineHeight: 15,
+            minHeight: 15,
         },
-        timestamp: {
+        bottomRow: {
+            marginTop: 12,
+            borderTopWidth: StyleSheet.hairlineWidth,
+            borderColor: 'rgba(255,255,255,0.22)',
+            paddingTop: 9,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+        },
+        action: {
             fontSize: 10,
-            color: color.primary._700,
-            marginTop: 9,
+            fontWeight: '800',
+            color: '#C9B2FF',
+            letterSpacing: 1,
+            flex: 1,
         },
     })
 }
