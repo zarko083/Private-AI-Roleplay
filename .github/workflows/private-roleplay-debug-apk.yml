@@ -1,0 +1,76 @@
+name: Private Roleplay - Debug APK
+
+# This workflow runs only on the feature branch.
+# Manual dispatch is available once the workflow is registered on the default branch.
+on:
+  push:
+    branches:
+      - feature/roleplay-ui-v01
+    paths:
+      - .github/workflows/private-roleplay-debug-apk.yml
+      - app/screens/CharacterListScreen/**
+      - app.config.js
+      - package.json
+      - package-lock.json
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: private-roleplay-debug-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-debug-apk:
+    if: github.ref == 'refs/heads/feature/roleplay-ui-v01'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify TypeScript
+        run: npx tsc --noEmit
+
+      - name: Generate Android native project
+        env:
+          APP_VARIANT: development
+          CI: '1'
+        run: npx expo prebuild --platform android --clean --no-install
+
+      - name: Build separate development APK
+        env:
+          APP_VARIANT: development
+          CI: '1'
+        working-directory: android
+        run: |
+          chmod +x ./gradlew
+          ./gradlew :app:assembleDebug --no-daemon
+
+      - name: Upload APK (only if build succeeds)
+        uses: actions/upload-artifact@v4
+        with:
+          name: private-roleplay-debug-apk
+          path: android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+          retention-days: 7
