@@ -25,6 +25,7 @@ type CharacterListHeaderProps = {
     resultLength: number
 }
 
+/** Compact sorting + discovery toolbar, using the original CharacterSorter state. */
 const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength }) => {
     const { t } = useTranslation()
     const [useTagHider, setUseTagHider] = useMMKVBoolean(AppSettings.UseTagHider)
@@ -39,17 +40,12 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                 setTagFilter: state.setTagFilter,
             }))
         )
-
     const { color } = Theme.useTheme()
     const [showTags, setShowTags] = useMMKVBoolean(AppSettings.ShowTags)
     const hiddenTags = TagHider.useHiddenTags()
-
     const { data } = useLiveQuery(
         db
-            .select({
-                tag: tags.tag,
-                tagCount: count(characterTags.tag_id),
-            })
+            .select({ tag: tags.tag, tagCount: count(characterTags.tag_id) })
             .from(tags)
             .leftJoin(characterTags, eq(characterTags.tag_id, tags.id))
             .groupBy(tags.tag)
@@ -69,7 +65,7 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
         }, [setShowSearch, setTextFilter, showSearch])
     )
 
-    if (resultLength === 0 && !showSearch) return
+    if (resultLength === 0 && !showSearch) return null
 
     return (
         <>
@@ -77,51 +73,40 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                 style={{
                     flexDirection: 'row',
                     justifyContent: 'space-between',
-                    paddingLeft: 16,
+                    alignItems: 'center',
+                    paddingLeft: 10,
                     paddingRight: 8,
                     paddingBottom: 12,
                 }}>
-                <View
-                    style={{
-                        columnGap: 12,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                    }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', columnGap: 3 }}>
                     <Text
                         style={{
-                            color: color.text._400,
-                            fontSize: 16,
+                            color: color.text._500,
+                            fontSize: 10,
+                            letterSpacing: 1,
+                            fontWeight: '700',
+                            marginRight: 4,
                         }}>
-                        {t('character.list.sort.label')}
+                        SORT
                     </Text>
                     <SortButton type="modified" label={t('character.list.sort.recent')} />
                     <SortButton type="name" label={t('character.list.columns.name')} />
                 </View>
-                <View
-                    style={{
-                        flexDirection: 'row',
-                        columnGap: 12,
-                    }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', columnGap: 4 }}>
                     <ThemedButton
                         iconName="tag"
                         variant="tertiary"
                         onPress={() => {
                             setShowTags(!showTags)
-                            if (showTags && tagFilter.length > 0) {
-                                setTagFilter([])
-                            }
+                            if (showTags && tagFilter.length > 0) setTagFilter([])
                         }}
-                        iconStyle={{
-                            color: showTags ? color.text._100 : color.text._700,
-                        }}
+                        iconStyle={{ color: showTags ? color.primary._800 : color.text._500 }}
                     />
                     <ThemedButton
                         variant="tertiary"
                         iconName={showSearch ? 'close' : 'search'}
-                        onPress={() => {
-                            setShowSearch(!showSearch)
-                        }}
-                        iconSize={24}
+                        onPress={() => setShowSearch(!showSearch)}
+                        iconSize={23}
                         delayLongPress={5000}
                         onLongPress={() => {
                             setUseTagHider(!useTagHider)
@@ -136,23 +121,22 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                     />
                 </View>
             </View>
-
             <Animated.View layout={LinearTransition}>
                 {showSearch && (
                     <Animated.View
                         entering={FadeIn.delay(100)}
                         exiting={FadeOut}
-                        style={{ paddingHorizontal: 12, paddingBottom: 8, rowGap: 8 }}>
+                        style={{ paddingHorizontal: 12, paddingBottom: 10, rowGap: 8 }}>
                         {showTags && data.length > 0 && (
                             <StringArrayEditor
                                 containerStyle={{ flex: 0 }}
-                                suggestions={data
+                                suggestions={[...data]
                                     .sort((a, b) => b.tagCount - a.tagCount)
                                     .map((item) => item.tag)}
                                 label={t('character.list.search.byTags')}
                                 value={tagFilter}
                                 setValue={setTagFilter}
-                                placeholder="Filter Tags..."
+                                placeholder="Filter tags..."
                                 filterOnly
                                 showSuggestionsOnEmpty
                             />
@@ -165,14 +149,10 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                             style={{
                                 color: resultLength === 0 ? color.text._700 : color.text._100,
                             }}
-                            placeholder="Name..."
+                            placeholder="Search characters..."
                         />
                         {(textFilter || tagFilter.length > 0) && (
-                            <Text
-                                style={{
-                                    marginTop: 8,
-                                    color: color.text._400,
-                                }}>
+                            <Text style={{ marginTop: 4, color: color.text._400 }}>
                                 {t('common.labels.results')}: {resultLength}
                             </Text>
                         )}
