@@ -54,8 +54,8 @@ module.exports = {
                     android: {
                         largeHeap: true,
                         usesCleartextTraffic: true,
-                        enableProguardInReleaseBuilds: true,
-                        enableShrinkResourcesInReleaseBuilds: true,
+                        enableMinifyInReleaseBuilds: !IS_DEV,
+                        enableShrinkResourcesInReleaseBuilds: !IS_DEV,
                         useLegacyPackaging: true,
                         extraProguardRules: '-keep class com.rnllama.** { *; }',
                     },
