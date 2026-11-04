@@ -18,137 +18,118 @@ type ChatFrameProps = {
     isLast?: boolean
 }
 
+/** More compact message framing while preserving Wide and Alternating settings. */
 const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, isLast, entry }) => {
     const { t } = useTranslation()
-    const { color, spacing, borderRadius, fontSize } = Theme.useTheme()
+    const { color, spacing, fontSize } = Theme.useTheme()
     const [wide] = useMMKVBoolean(AppSettings.WideChatMode)
     const [alternate] = useMMKVBoolean(AppSettings.AlternatingChatMode)
-
     const setShowViewer = useAvatarViewerStore((state) => state.setShow)
     const charImageId = Characters.useCharacterStore((state) => state.card?.image_id) ?? 0
     const userImageId = Characters.useUserStore((state) => state.card?.image_id) ?? 0
     const swipe = entry.swipes[0]
-    if (!swipe) return
+    if (!swipe) return null
 
-    const getDeltaTime = () =>
-        Math.round(
-            Math.max(
-                0,
-                // eslint-disable-next-line react-hooks/purity
-                ((nowGenerating && isLast ? Date.now() : swipe.gen_finished.getTime()) -
-                    swipe.gen_started.getTime()) /
-                    1000
-            )
+    const isReverse = entry.is_user && Boolean(alternate)
+    const direction = isReverse ? 'row-reverse' : 'row'
+    const align = isReverse ? 'flex-end' : 'flex-start'
+    const elapsedSeconds = Math.round(
+        Math.max(
+            0,
+            // eslint-disable-next-line react-hooks/purity
+            ((nowGenerating && isLast ? Date.now() : swipe.gen_finished.getTime()) -
+                swipe.gen_started.getTime()) /
+                1000
         )
-    const deltaTime = getDeltaTime()
+    )
 
-    const rowDir = entry.is_user && alternate ? 'row-reverse' : 'row'
-    const align = entry.is_user && alternate ? 'flex-end' : 'flex-start'
-    if (wide)
+    const avatar = (
+        <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={`View ${entry.name} avatar`}
+            onPress={() => setShowViewer(true, entry.is_user)}>
+            <Avatar
+                style={{
+                    width: wide ? 42 : 36,
+                    height: wide ? 42 : 36,
+                    borderRadius: 13,
+                }}
+                targetImage={Characters.getImageDir(
+                    entry.is_user ? userImageId : charImageId
+                )}
+                contentFit="cover"
+            />
+        </TouchableOpacity>
+    )
+
+    const label = (
+        <View
+            style={{
+                flexDirection: direction,
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                columnGap: 10,
+                rowGap: 2,
+                marginBottom: 8,
+            }}>
+            <Text
+                numberOfLines={1}
+                style={{ fontSize: fontSize.m, fontWeight: '700', color: color.text._100 }}>
+                {entry.name}
+            </Text>
+            <Text style={{ fontSize: fontSize.s, color: color.text._500 }}>
+                {swipe.gen_finished.toLocaleTimeString()}
+            </Text>
+            <Text style={{ fontSize: 10, color: color.text._700 }}>
+                {t('chat.frame.entryNumber', { index })}
+            </Text>
+            {!entry.is_user && index !== 0 && (
+                <Text style={{ fontSize: 10, color: color.text._700 }}>
+                    {t('chat.frame.seconds', { seconds: elapsedSeconds })}
+                </Text>
+            )}
+        </View>
+    )
+
+    if (wide) {
         return (
             <View
                 style={{
-                    flex: 1,
-                    paddingHorizontal: 8,
-                    paddingVertical: 8,
-                    borderRadius: 16,
-                    backgroundColor: color.neutral._100 + 'bb',
+                    borderWidth: 1,
+                    borderColor: color.neutral._400,
+                    borderRadius: 18,
+                    marginHorizontal: 8,
+                    padding: 11,
+                    backgroundColor: color.neutral._100 + 'dd',
                 }}>
                 <View
                     style={{
-                        flexDirection: rowDir,
+                        flexDirection: direction,
                         alignItems: 'center',
-                        marginBottom: spacing.l,
+                        columnGap: spacing.m,
+                        marginBottom: 6,
                     }}>
-                    <TouchableOpacity onPress={() => setShowViewer(true, entry.is_user)}>
-                        <Avatar
-                            style={{
-                                width: 48,
-                                height: 48,
-                                borderRadius: borderRadius.xl,
-                                marginRight: entry.is_user && alternate ? 0 : spacing.l,
-                                marginLeft: entry.is_user && alternate ? spacing.l : 0,
-                            }}
-                            targetImage={Characters.getImageDir(
-                                entry.is_user ? userImageId : charImageId
-                            )}
-                        />
-                    </TouchableOpacity>
-                    <View style={{ alignItems: align }}>
-                        <Text
-                            style={{
-                                fontSize: fontSize.l,
-                                color: color.text._100,
-                            }}>
-                            {entry.name}
-                        </Text>
-                        <View style={{ columnGap: 12, flexDirection: rowDir }}>
-                            <Text style={{ fontSize: fontSize.s, color: color.text._400 }}>
-                                {swipe.gen_finished.toLocaleTimeString()}
-                            </Text>
-                            <Text style={{ color: color.text._700, fontSize: fontSize.s }}>
-                                {t('chat.frame.entryNumber', { index })}
-                            </Text>
-                            {deltaTime !== undefined && !entry.is_user && index !== 0 && (
-                                <Text style={{ color: color.text._700, fontSize: fontSize.s }}>
-                                    {t('chat.frame.seconds', { seconds: deltaTime })}
-                                </Text>
-                            )}
-                        </View>
-                    </View>
+                    {avatar}
+                    <View style={{ flex: 1 }}>{label}</View>
                 </View>
                 {children}
             </View>
         )
+    }
 
     return (
-        <View style={{ flexDirection: rowDir, marginHorizontal: spacing.m }}>
-            <View
-                style={{
-                    alignItems: 'center',
-                }}>
-                <View style={{ rowGap: spacing.m, alignItems: 'center' }}>
-                    <TouchableOpacity onPress={() => setShowViewer(true, entry.is_user)}>
-                        <Avatar
-                            style={{
-                                width: 48,
-                                height: 48,
-                                borderRadius: borderRadius.xl,
-                                marginHorizontal: 4,
-                            }}
-                            targetImage={Characters.getImageDir(
-                                entry.is_user ? userImageId : charImageId
-                            )}
-                        />
-                    </TouchableOpacity>
-
-                    <Text style={{ color: color.text._400 }}>
-                        {t('chat.frame.entryNumber', { index })}
-                    </Text>
-                    {deltaTime !== undefined && !entry.is_user && index !== 0 && (
-                        <Text style={{ color: color.text._400 }}>
-                            {t('chat.frame.seconds', { seconds: deltaTime })}
-                        </Text>
-                    )}
-                </View>
-            </View>
-            <View style={{ flex: 1 }}>
-                <View style={{ flex: 1 }}>
-                    <View style={{ marginBottom: spacing.m, alignItems: align }}>
-                        <Text
-                            style={{
-                                fontSize: fontSize.l,
-                                color: color.text._100,
-                                marginRight: spacing.sm,
-                            }}>
-                            {entry.name}
-                        </Text>
-                        <Text style={{ fontSize: fontSize.s, color: color.text._400 }}>
-                            {swipe.gen_finished.toLocaleTimeString()}
-                        </Text>
-                    </View>
-                </View>
-                {children}
+        <View
+            style={{
+                flexDirection: direction,
+                alignItems: 'flex-start',
+                marginHorizontal: 10,
+                marginVertical: 5,
+                columnGap: 10,
+            }}>
+            {avatar}
+            <View style={{ flex: 1, minWidth: 0, alignItems: align }}>
+                {label}
+                <View style={{ width: '100%' }}>{children}</View>
             </View>
         </View>
     )

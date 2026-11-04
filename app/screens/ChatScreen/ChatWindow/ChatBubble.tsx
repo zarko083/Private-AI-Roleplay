@@ -23,6 +23,7 @@ type ChatTextProps = {
     entry: Chats.db.live.LiveEntry
 }
 
+/** Restyled message body. Editing, regeneration, swipes and attachments stay intact. */
 const ChatBubble: React.FC<ChatTextProps> = ({
     index,
     nowGenerating,
@@ -33,69 +34,50 @@ const ChatBubble: React.FC<ChatTextProps> = ({
     const { t } = useTranslation()
     const { appMode } = useAppMode()
     const [showTPS] = useMMKVBoolean(AppSettings.ShowTokenPerSecond)
-    const { color, spacing, borderRadius, fontSize } = Theme.useTheme()
-
-    const { setShowOptions } = useChatActionsState(
-        useShallow((state) => ({
-            setShowOptions: state.setActiveIndex,
-        }))
-    )
-
+    const { color, spacing, fontSize } = Theme.useTheme()
+    const setShowOptions = useChatActionsState(useShallow((state) => state.setActiveIndex))
     const showEditor = useChatEditorStore((state) => state.show)
-    const handleEnableEdit = () => {
-        if (!nowGenerating) showEditor(entry.id)
-    }
+    const swipe = entry?.swipes?.[0]
 
-    const swipe = entry.swipes[0]
-    if (!entry || !swipe) return
+    if (!entry || !swipe) return null
 
     const showSwipe = !entry.is_user && isLastMessage
     const timings = swipe.timings
-    const bubbleColor = entry.is_user ? color.neutral._200 : color.neutral._200
+
     return (
         <View>
             <Pressable
-                onPress={() => {
-                    setShowOptions(nowGenerating ? undefined : entry.id)
+                accessibilityRole="button"
+                onPress={() => setShowOptions(nowGenerating ? undefined : entry.id)}
+                onLongPress={() => {
+                    if (!nowGenerating) showEditor(entry.id)
                 }}
                 style={{
-                    backgroundColor: bubbleColor,
-                    borderColor: color.neutral._200,
+                    backgroundColor: entry.is_user ? color.primary._100 : color.neutral._200,
+                    borderColor: entry.is_user ? color.primary._400 : color.neutral._400,
                     borderWidth: 1,
-                    marginBottom: showSwipe ? 0 : 4,
-                    paddingVertical: spacing.sm,
-                    paddingHorizontal: spacing.m,
-                    minHeight: 40,
-                    borderRadius: borderRadius.m,
-                    shadowColor: color.shadow,
-                    boxShadow: [
-                        {
-                            offsetX: 1,
-                            offsetY: 1,
-                            spreadDistance: 2,
-                            color: color.shadow,
-                            blurRadius: 4,
-                        },
-                    ],
-                }}
-                onLongPress={handleEnableEdit}>
+                    marginBottom: showSwipe ? 1 : 5,
+                    paddingVertical: spacing.m,
+                    paddingHorizontal: spacing.l,
+                    minHeight: 44,
+                    borderRadius: 18,
+                    borderTopRightRadius: entry.is_user ? 5 : 18,
+                    borderTopLeftRadius: entry.is_user ? 18 : 5,
+                }}>
                 {isLastMessage ? (
                     <ChatTextLast nowGenerating={nowGenerating} swipe={swipe} />
                 ) : (
                     <ChatText swipeText={swipe.swipe} />
                 )}
                 <ChatAttachments entry={entry} />
-                <View
-                    style={{
-                        flexDirection: 'row',
-                    }}>
+                <View style={{ flexDirection: 'row' }}>
                     {showTPS && appMode === 'local' && timings && (
                         <Text
                             style={{
                                 color: color.text._500,
                                 fontWeight: '300',
-                                textAlign: 'right',
                                 fontSize: fontSize.s,
+                                marginTop: 6,
                             }}>
                             {t('chat.bubble.promptSpeed', {
                                 tokens: getFiniteValue(timings.prompt_per_second),
@@ -107,7 +89,6 @@ const ChatBubble: React.FC<ChatTextProps> = ({
                             })}
                         </Text>
                     )}
-
                     <ChatQuickActions
                         nowGenerating={nowGenerating}
                         isLastMessage={isLastMessage}
