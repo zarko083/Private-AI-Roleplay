@@ -1,14 +1,15 @@
-name: Private Roleplay - Debug APK
+name: Private Roleplay - Validate & APK
 
-# This workflow runs only on the feature branch.
-# Manual dispatch is available once the workflow is registered on the default branch.
+# Every push checks the TypeScript frontend.
+# A full Android build runs ONLY if the final commit message contains [build-apk].
+# This avoids a 40+ minute build for every small UI edit.
 on:
   push:
     branches:
       - feature/roleplay-ui-v01
     paths:
       - .github/workflows/private-roleplay-debug-apk.yml
-      - app/screens/CharacterListScreen/**
+      - app/**
       - app.config.js
       - package.json
       - package-lock.json
@@ -18,31 +19,46 @@ permissions:
   contents: read
 
 concurrency:
-  group: private-roleplay-debug-${{ github.ref }}
+  group: private-roleplay-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  build-debug-apk:
-    if: github.ref == 'refs/heads/feature/roleplay-ui-v01'
+  check-frontend:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
-
+    timeout-minutes: 15
     steps:
       - name: Check out branch
         uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Verify TypeScript
+        run: npx tsc --noEmit
 
+  build-release-apk:
+    needs: check-frontend
+    if: >-
+      github.ref == 'refs/heads/feature/roleplay-ui-v01' &&
+      (github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[build-apk]'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
       - name: Set up Node.js 22
         uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'npm'
-
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
-
       - name: Use preinstalled Android SDK
         shell: bash
         run: |
@@ -51,21 +67,14 @@ jobs:
             exit 1
           fi
           echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> "$GITHUB_ENV"
-          echo "Android SDK: $ANDROID_HOME"
-
       - name: Install dependencies
         run: npm ci
-
-      - name: Verify TypeScript
-        run: npx tsc --noEmit
-
       - name: Generate Android native project
         env:
           APP_VARIANT: development
           CI: '1'
         run: npx expo prebuild --platform android --clean --no-install
-
-      - name: Build separate development APK
+      - name: Build standalone ARM64 APK
         env:
           APP_VARIANT: development
           CI: '1'
@@ -77,8 +86,7 @@ jobs:
             --max-workers=2 \
             -PreactNativeArchitectures=arm64-v8a \
             '-Dorg.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8'
-
-      - name: Upload APK (only if build succeeds)
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: private-roleplay-release-apk
