@@ -72,12 +72,12 @@ jobs:
         working-directory: android
         run: |
           chmod +x ./gradlew
-          ./gradlew :app:assembleDebug --no-daemon
+          ./gradlew :app:assembleRelease --no-daemon
 
       - name: Upload APK (only if build succeeds)
         uses: actions/upload-artifact@v4
         with:
-          name: private-roleplay-debug-apk
-          path: android/app/build/outputs/apk/debug/*.apk
+          name: private-roleplay-release-apk
+          path: android/app/build/outputs/apk/release/*.apk
           if-no-files-found: error
           retention-days: 7
