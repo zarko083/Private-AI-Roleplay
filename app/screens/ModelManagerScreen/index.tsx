@@ -1,10 +1,9 @@
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { SectionList } from 'react-native'
+import { SectionList, Text, View } from 'react-native'
 import Animated, { Easing, SlideInLeft, SlideOutLeft } from 'react-native-reanimated'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useShallow } from 'zustand/react/shallow'
 
 import HorizontalSelector from '@components/input/HorizontalSelector'
 import SectionTitle from '@components/text/SectionTitle'
@@ -22,99 +21,67 @@ import ModelSettings from './ModelSettings'
 
 const ModelManagerScreen = () => {
     const { t } = useTranslation()
-    const { spacing } = Theme.useTheme()
-
+    const { color, spacing } = Theme.useTheme()
     const { data: mmprojLinks } = useLiveQuery(Model.getMMPROJLinks())
-
-    const { data: modelList, updatedAt: modelUpdatedAt } = useLiveQuery(
-        Model.getModelListQuery2(),
-        [mmprojLinks]
-    )
+    const { data: modelList, updatedAt: modelUpdatedAt } = useLiveQuery(Model.getModelListQuery2(), [mmprojLinks])
     const { data: mmprojList } = useLiveQuery(Model.getMMPROJListQuery())
-
     const [showSettings, setShowSettings] = useState(false)
     const [modelLoading, setModelLoading] = useState(false)
     const [modelImporting, setModelImporting] = useState(false)
-
-    const { setloadProgress } = Llama.useLlamaModelStore(
-        useShallow((state) => ({
-            setloadProgress: state.setLoadProgress,
-        }))
-    )
+    const setLoadProgress = Llama.useLlamaModelStore((state) => state.setLoadProgress)
 
     const data = [
-        {
-            title: t('model.title'),
-            data: modelList ?? [],
-        },
-        {
-            title: t('model.mtmd'),
-            data: mmprojList ?? [],
-        },
+        { title: t('model.title'), data: modelList ?? [] },
+        { title: t('model.mtmd'), data: mmprojList ?? [] },
     ]
 
     return (
         <SafeAreaView
             edges={['bottom']}
-            style={{
-                paddingTop: spacing.xl,
-                paddingHorizontal: spacing.xl,
-                paddingBottom: spacing.xl2,
-                flex: 1,
-            }}>
-            <HeaderTitle title={showSettings ? t('model.settings.title') : t('model.title')} />
+            style={{ paddingTop: spacing.l, paddingHorizontal: spacing.xl, paddingBottom: spacing.xl, flex: 1, backgroundColor: color.neutral._100 }}>
+            <HeaderTitle title={showSettings ? 'Model Configuration' : 'Local AI Models'} />
             <HeaderButton
                 headerRight={() =>
                     !showSettings && (
-                        <ModelNewMenu
-                            modelImporting={modelImporting}
-                            setModelImporting={setModelImporting}
-                        />
+                        <ModelNewMenu modelImporting={modelImporting} setModelImporting={setModelImporting} />
                     )
                 }
             />
 
             {!showSettings && (
-                <Animated.View
-                    style={{ flex: 1 }}
-                    entering={SlideInLeft.easing(Easing.inOut(Easing.cubic))}
-                    exiting={SlideOutLeft.easing(Easing.inOut(Easing.cubic))}>
+                <Animated.View style={{ flex: 1 }} entering={SlideInLeft.easing(Easing.inOut(Easing.cubic))} exiting={SlideOutLeft.easing(Easing.inOut(Easing.cubic))}>
                     <ModelInfoHeader
                         modelImporting={modelImporting}
                         modelLoading={modelLoading}
                         modelListLength={modelList.length}
                         modelUpdatedAt={modelUpdatedAt}
                     />
-
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 4, marginTop: 4, marginBottom: 4 }}>
+                        <Text style={{ color: color.text._100, fontSize: 14, fontWeight: '700' }}>On-device library</Text>
+                        <Text style={{ color: color.text._500, fontSize: 11 }}>{modelList.length} models</Text>
+                    </View>
                     <SectionList
-                        style={{
-                            marginTop: 16,
-                            flex: 1,
-                        }}
+                        style={{ flex: 1, marginTop: 8 }}
                         sections={data}
-                        renderItem={({ item, index }) => (
+                        renderItem={({ item }) => (
                             <ModelItem
                                 item={item}
                                 mmprojList={mmprojList}
                                 modelLoading={modelLoading}
-                                setModelLoading={(b: boolean) => {
-                                    if (b) setloadProgress(0)
-                                    setModelLoading(b)
+                                setModelLoading={(value: boolean) => {
+                                    if (value) setLoadProgress(0)
+                                    setModelLoading(value)
                                 }}
                                 modelImporting={modelImporting}
                             />
                         )}
-                        renderSectionHeader={({ section: { title, data } }) => {
-                            if (mmprojList.length > 0)
-                                return (
-                                    <SectionTitle
-                                        visible={data.length > 0}
-                                        style={{ marginBottom: 16 }}>
-                                        {title}
-                                    </SectionTitle>
-                                )
-                            return <></>
-                        }}
+                        renderSectionHeader={({ section: { title, data: sectionData } }) =>
+                            mmprojList.length > 0 ? (
+                                <SectionTitle visible={sectionData.length > 0} style={{ marginVertical: 9 }}>
+                                    {title}
+                                </SectionTitle>
+                            ) : null
+                        }
                         keyExtractor={(item) => item.id.toString()}
                         removeClippedSubviews={false}
                         showsVerticalScrollIndicator={false}

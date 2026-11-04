@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router'
 import { Pressable, Text, View } from 'react-native'
 
 import Avatar from '@components/views/Avatar'
+import { Llama } from '@lib/engine/Local/LlamaLocal'
 import { useActiveProvider } from '@lib/hooks/ActiveProvider'
 import { Characters } from '@lib/state/Characters'
 import { Theme } from '@lib/theme/ThemeManager'
@@ -12,23 +13,24 @@ const ChatIdentityBar = () => {
     const router = useRouter()
     const { available, mode } = useActiveProvider()
     const card = Characters.useCharacterStore((state) => state.card)
+    const localModelName = Llama.useLlamaModelStore((state) => state.model?.name)
 
     const status = !available
         ? mode === 'local'
             ? 'SELECT LOCAL MODEL'
             : 'CONNECT PROVIDER'
         : mode === 'local'
-          ? 'LOCAL MODEL READY'
+          ? 'LOCAL READY'
           : 'PROVIDER CONNECTED'
 
     return (
         <View
             style={{
                 marginHorizontal: 14,
-                marginTop: 4,
-                marginBottom: 10,
+                marginTop: 2,
+                marginBottom: 8,
                 paddingHorizontal: 12,
-                paddingVertical: 10,
+                paddingVertical: 9,
                 borderRadius: 18,
                 borderWidth: 1,
                 borderColor: color.neutral._400,
@@ -56,7 +58,7 @@ const ChatIdentityBar = () => {
                         fontWeight: '700',
                         color: color.text._500,
                     }}>
-                    PRIVATE CONVERSATION
+                    {mode === 'local' && localModelName ? localModelName : 'PRIVATE CONVERSATION'}
                 </Text>
             </View>
             <Pressable
@@ -81,7 +83,7 @@ const ChatIdentityBar = () => {
                 <Text
                     numberOfLines={2}
                     style={{
-                        maxWidth: 120,
+                        maxWidth: 94,
                         textAlign: 'center',
                         fontWeight: '700',
                         fontSize: 9,

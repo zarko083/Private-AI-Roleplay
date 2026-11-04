@@ -3,7 +3,7 @@ import { randomUUID } from 'expo-crypto'
 import { Image } from 'expo-image'
 import { launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from 'expo-image-picker'
 import { router } from 'expo-router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Keyboard, Pressable, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
@@ -54,6 +54,7 @@ const ChatInput = () => {
     const { color } = Theme.useTheme()
     const [sendOnEnter] = useMMKVBoolean(AppSettings.SendOnEnter)
     const [disableSend, setDisableSend] = useState(false)
+    const [generationSeconds, setGenerationSeconds] = useState(0)
     const [attachments, setAttachments] = useState<Attachment[]>([])
     const cameraSheetRef = useBottomSheetRef()
     const { nowGenerating, abortFunction } = useInference(
@@ -69,6 +70,19 @@ const ChatInput = () => {
     const { newMessage, setNewMessage } = useChatInputTextStore(
         useShallow((state) => ({ newMessage: state.text, setNewMessage: state.setText }))
     )
+
+    // Count elapsed generation time without changing the inference engine.
+    useEffect(() => {
+        if (!nowGenerating) {
+            setGenerationSeconds(0)
+            return
+        }
+        const start = Date.now()
+        const timer = setInterval(() => {
+            setGenerationSeconds(Math.round((Date.now() - start) / 1000))
+        }, 1000)
+        return () => clearInterval(timer)
+    }, [nowGenerating])
 
     const abortResponse = async () => {
         Logger.info(t('chat.input.errors.abortGeneration'))
@@ -145,12 +159,12 @@ const ChatInput = () => {
                 width: '96%',
                 alignSelf: 'center',
                 bottom: 6,
-                padding: 10,
+                padding: 8,
                 backgroundColor: color.neutral._200,
                 borderWidth: 1,
                 borderColor: color.neutral._400,
-                borderRadius: 21,
-                rowGap: 8,
+                borderRadius: 18,
+                rowGap: 6,
             }}>
             <Text
                 style={{
@@ -158,9 +172,13 @@ const ChatInput = () => {
                     fontSize: 10,
                     fontWeight: '800',
                     letterSpacing: 1.3,
-                    marginLeft: 6,
+                    marginLeft: 5,
                 }}>
-                {activeProvider ? 'YOUR NEXT SCENE' : 'CHOOSE A MODEL TO START CHATTING'}
+                {nowGenerating
+                    ? `AI IS WRITING · ${generationSeconds}s · TAP STOP TO END`
+                    : activeProvider
+                      ? 'YOUR NEXT SCENE'
+                      : 'CHOOSE A MODEL TO START CHATTING'}
             </Text>
 
             {attachments.length > 0 && (
@@ -249,7 +267,7 @@ const ChatInput = () => {
                         color: color.text._100,
                         backgroundColor: color.neutral._100,
                         flex: 1,
-                        minHeight: 44,
+                        minHeight: 42,
                         maxHeight: 150,
                         borderWidth: 1,
                         borderColor: activeProvider ? color.primary._300 : color.neutral._400,
@@ -279,8 +297,8 @@ const ChatInput = () => {
                     accessibilityLabel={nowGenerating ? 'Stop generation' : 'Send message'}
                     disabled={disableSend || !chatId || !activeProvider}
                     style={{
-                        width: 45,
-                        height: 45,
+                        width: 43,
+                        height: 43,
                         borderRadius: 15,
                         alignItems: 'center',
                         justifyContent: 'center',

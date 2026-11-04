@@ -1,7 +1,5 @@
 import AntDesign from '@react-native-vector-icons/ant-design/static'
-import React from 'react'
-import { Trans, useTranslation } from 'react-i18next'
-import { View, Text, StyleSheet } from 'react-native'
+import { Text, View } from 'react-native'
 import * as Progress from 'react-native-progress'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -15,91 +13,87 @@ type ModelInfoHeaderProps = {
     modelUpdatedAt: Date | undefined
 }
 
+/** Status dashboard for local GGUF. Model lifecycle is still owned by ChatterUI. */
 const ModelInfoHeader: React.FC<ModelInfoHeaderProps> = ({
     modelImporting,
     modelLoading,
     modelListLength,
     modelUpdatedAt,
 }) => {
-    const { t } = useTranslation()
-    const styles = useStyles()
     const { color } = Theme.useTheme()
-
     const { modelName, loadProgress } = Llama.useLlamaModelStore(
         useShallow((state) => ({
             modelName: state.model?.name,
             loadProgress: state.loadProgress,
         }))
     )
+    const ready = Boolean(modelName) && !modelLoading
+    const label = modelImporting
+        ? 'IMPORTING MODEL'
+        : modelLoading
+          ? 'LOADING LOCAL MODEL'
+          : ready
+            ? 'LOCAL MODEL READY'
+            : 'NO MODEL LOADED'
+    const statusText = modelImporting
+        ? 'Adding a GGUF model to your device'
+        : modelLoading
+          ? 'Preparing the model for private conversations'
+          : ready
+            ? 'Your conversations run on this device'
+            : modelListLength > 0
+              ? 'Select a model below to start your story'
+              : modelUpdatedAt
+                ? 'Import or link a GGUF model to get started'
+                : 'Checking your local models'
 
     return (
-        <View style={styles.modelContainer}>
-            {!modelImporting && !modelLoading && modelListLength !== 0 && (
-                <Text style={styles.subtitle}>
-                    {t('model.info.loaded')}:{' '}
-                    <Text style={styles.modelTitle} ellipsizeMode="tail" numberOfLines={1}>
-                        {modelName ?? t('common.labels.none')}
-                    </Text>
+        <View
+            style={{
+                backgroundColor: color.neutral._200,
+                borderColor: color.neutral._400,
+                borderWidth: 1,
+                borderRadius: 22,
+                paddingHorizontal: 17,
+                paddingVertical: 17,
+                marginBottom: 12,
+            }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', columnGap: 9 }}>
+                <View
+                    style={{
+                        width: 30,
+                        height: 30,
+                        backgroundColor: ready ? color.primary._100 : color.neutral._300,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: 11,
+                    }}>
+                    <AntDesign name={ready ? 'check-circle' : 'database'} size={17} color={ready ? color.primary._800 : color.text._400} />
+                </View>
+                <Text style={{ color: ready ? color.primary._800 : color.text._400, fontSize: 11, letterSpacing: 1, fontWeight: '800', flex: 1 }}>
+                    {label}
                 </Text>
-            )}
-            {!modelImporting && !modelLoading && modelListLength === 0 && modelUpdatedAt && (
-                <View>
-                    <Text style={styles.hint}>
-                        <Trans
-                            i18nKey="model.info.hint"
-                            components={{
-                                icon: (
-                                    <AntDesign name="file-add" size={16} color={color.text._400} />
-                                ),
-                            }}
+            </View>
+            <Text numberOfLines={2} style={{ marginTop: 12, fontSize: 18, fontWeight: '700', color: color.text._100 }}>
+                {modelName ?? 'Your local AI models'}
+            </Text>
+            <Text style={{ marginTop: 5, fontSize: 12, lineHeight: 18, color: color.text._400 }}>
+                {statusText}
+            </Text>
+            {(modelLoading || modelImporting) && (
+                <View style={{ marginTop: 16, flexDirection: 'row', alignItems: 'center', columnGap: 12 }}>
+                    <View style={{ flex: 1 }}>
+                        <Progress.Bar
+                            indeterminate={modelImporting}
+                            progress={modelLoading ? Math.max(0, Math.min(1, loadProgress / 100)) : undefined}
+                            color={color.primary._500}
+                            borderColor={color.neutral._400}
+                            height={8}
+                            borderRadius={10}
+                            width={null}
                         />
-                    </Text>
-                </View>
-            )}
-
-            {!modelLoading && modelImporting && (
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Progress.Bar
-                        style={{ flex: 5 }}
-                        indeterminate
-                        indeterminateAnimationDuration={2000}
-                        color={color.primary._500}
-                        borderColor={color.neutral._300}
-                        height={12}
-                        borderRadius={12}
-                        width={null}
-                    />
-
-                    <Text
-                        style={{
-                            flex: 2,
-                            color: color.text._100,
-                            textAlign: 'center',
-                        }}>
-                        Importing...
-                    </Text>
-                </View>
-            )}
-
-            {modelLoading && !modelImporting && (
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Progress.Bar
-                        style={{ flex: 5 }}
-                        progress={loadProgress / 100}
-                        color={color.primary._500}
-                        borderColor={color.neutral._300}
-                        height={12}
-                        borderRadius={12}
-                        width={null}
-                    />
-                    <Text
-                        style={{
-                            flex: 1,
-                            color: color.text._100,
-                            textAlign: 'center',
-                        }}>
-                        {loadProgress}%
-                    </Text>
+                    </View>
+                    <Text style={{ color: color.text._300, fontSize: 12 }}>{modelLoading ? `${loadProgress}%` : '...'}</Text>
                 </View>
             )}
         </View>
@@ -107,47 +101,3 @@ const ModelInfoHeader: React.FC<ModelInfoHeaderProps> = ({
 }
 
 export default ModelInfoHeader
-
-export const useStyles = () => {
-    const { color, spacing, borderRadius, fontSize } = Theme.useTheme()
-
-    return StyleSheet.create({
-        mainContainer: {
-            paddingTop: spacing.xl,
-            paddingHorizontal: spacing.xl,
-            paddingBottom: spacing.xl2,
-            flex: 1,
-        },
-
-        list: {
-            marginTop: 16,
-            flex: 1,
-        },
-
-        modelContainer: {
-            borderRadius: borderRadius.l,
-            paddingVertical: spacing.l,
-            paddingHorizontal: spacing.xl2,
-            backgroundColor: color.neutral._200,
-            marginBottom: spacing.l,
-        },
-
-        title: {
-            fontSize: fontSize.l,
-            color: color.text._100,
-        },
-
-        modelTitle: {
-            color: color.primary._700,
-            flex: 1,
-        },
-
-        subtitle: {
-            color: color.text._300,
-        },
-
-        hint: {
-            color: color.text._400,
-        },
-    })
-}

@@ -27,10 +27,10 @@ const ChatFooter = ({ chatLength }: { chatLength: number }) => {
         <View
             style={{
                 marginHorizontal: 24,
-                marginTop: 45,
-                marginBottom: 20,
+                marginTop: 20,
+                marginBottom: 13,
                 paddingHorizontal: 18,
-                paddingVertical: 24,
+                paddingVertical: 18,
                 alignItems: 'center',
                 borderRadius: 22,
                 borderWidth: 1,
@@ -40,15 +40,15 @@ const ChatFooter = ({ chatLength }: { chatLength: number }) => {
             <Avatar
                 targetImage={Characters.getImageDir(card?.image_id ?? 0)}
                 contentFit="cover"
-                style={{ width: 82, height: 82, borderRadius: 25 }}
+                style={{ width: 64, height: 64, borderRadius: 21 }}
             />
             <Text
                 numberOfLines={2}
                 style={{
                     color: color.text._100,
-                    fontSize: 21,
+                    fontSize: 19,
                     fontWeight: '700',
-                    marginTop: 16,
+                    marginTop: 11,
                     textAlign: 'center',
                 }}>
                 {card?.name || 'A new story'}
@@ -61,7 +61,7 @@ const ChatFooter = ({ chatLength }: { chatLength: number }) => {
                     fontSize: 13,
                     lineHeight: 20,
                 }}>
-                Every conversation begins with a moment. Write the first scene below.
+                Set the scene, choose your words, and begin a new chapter.
             </Text>
             {!available && (
                 <Pressable

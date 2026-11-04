@@ -29,6 +29,7 @@ import { Chats } from '@lib/state/Chat'
 import { useAvatarViewerStore } from '@lib/state/components/AvatarViewer'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
+import CharacterEditorGuide, { EditorChapter } from './CharacterEditorGuide'
 
 const ChracterEditorScreen = () => {
     const { t } = useTranslation()
@@ -283,6 +284,8 @@ const ChracterEditorScreen = () => {
                         showsVerticalScrollIndicator={false}
                         keyboardShouldPersistTaps="always"
                         contentContainerStyle={{ rowGap: 8, paddingBottom: 24 }}>
+                        <CharacterEditorGuide name={characterCard.name} descriptionTokens={descriptionTokens} edited={edited} />
+                        <EditorChapter title="IDENTITY" description="Set an image and name for your character." />
                         <View style={styles.characterHeader}>
                             <ContextMenu
                                 placement="right"
@@ -372,6 +375,7 @@ const ChracterEditorScreen = () => {
                             </View>
                         </View>
 
+                        <EditorChapter title="CORE CHARACTER" description="Describe the character, voice, appearance and important details." />
                         <ThemedTextInput
                             scrollEnabled
                             label={t('character.editor.metrics.descriptionTokens', {
@@ -389,6 +393,7 @@ const ChracterEditorScreen = () => {
                             value={characterCard?.description}
                         />
 
+                        <EditorChapter title="OPENING SCENE" description="Set the first message and alternate greetings." />
                         <ThemedTextInput
                             label={t('character.editor.fields.firstMessage')}
                             multiline
@@ -511,6 +516,7 @@ const ChracterEditorScreen = () => {
                             )}
                         </View>
 
+                        <EditorChapter title="WORLD & BEHAVIOUR" description="Define personality, scenario, examples and discovery tags." />
                         <ThemedTextInput
                             label={t('character.editor.fields.personality')}
                             multiline
@@ -654,3 +660,4 @@ const useStyles = () => {
 }
 
 export default ChracterEditorScreen
+
