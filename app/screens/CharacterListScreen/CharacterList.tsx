@@ -2,7 +2,7 @@ import { useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import { usePathname } from 'expo-router'
 import { useMemo, useState } from 'react'
 import { View } from 'react-native'
-import Animated, { LinearTransition } from 'react-native-reanimated'
+import Animated from 'react-native-reanimated'
 import { useShallow } from 'zustand/react/shallow'
 
 import Drawer from '@components/views/Drawer'
@@ -12,6 +12,7 @@ import { Characters, CharInfo } from '@lib/state/Characters'
 import { CharacterSorter } from '@lib/state/CharacterSorter'
 import { TagHider } from '@lib/state/TagHider'
 
+import CharacterLibraryBanner from './CharacterLibraryBanner'
 import CharacterListHeader from './CharacterListHeader'
 import CharacterListing from './CharacterListing'
 import CharacterNewMenu from './CharacterNewMenu'
@@ -58,9 +59,9 @@ const CharacterList: React.FC = () => {
         }))
     }, [data])
 
-    // do not render when not shown, optimizes some rerenders
+    // Only render this screen while it is the active route.
     const path = usePathname()
-    if (path !== '/') return
+    if (path !== '/') return null
 
     return (
         <View style={{ paddingTop: 16, paddingHorizontal: 8, flex: 1 }}>
@@ -72,29 +73,31 @@ const CharacterList: React.FC = () => {
                 )}
             />
 
+            <CharacterLibraryBanner characterCount={characterList.length} />
             <CharacterListHeader resultLength={characterList.length} />
             <View style={{ flex: 1 }}>
                 <Animated.FlatList
-                    layout={LinearTransition}
-                    itemLayoutAnimation={LinearTransition}
+                    key="private-grid-2"
+                    numColumns={2}
+                    columnWrapperStyle={{ justifyContent: 'space-between' }}
                     showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{ rowGap: 16 }}
+                    contentContainerStyle={{ rowGap: 14, paddingHorizontal: 6, paddingBottom: 36 }}
                     data={characterList}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={({ item }) => (
-                        <CharacterListing
-                            character={item}
-                            nowLoading={nowLoading}
-                            setNowLoading={setNowLoading}
-                        />
+                        <View style={{ width: '48.5%' }}>
+                            <CharacterListing
+                                character={item}
+                                nowLoading={nowLoading}
+                                setNowLoading={setNowLoading}
+                            />
+                        </View>
                     )}
                     onEndReachedThreshold={1}
                     onEndReached={() => {
-                        if (previousLength === data.length) {
-                            return
-                        }
+                        if (previousLength === data.length) return
                         setPreviousLength(data.length)
-                        setPages(pages + 1)
+                        setPages((previous) => previous + 1)
                     }}
                     windowSize={3}
                     onStartReachedThreshold={0.1}
