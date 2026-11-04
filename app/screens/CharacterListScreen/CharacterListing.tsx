@@ -38,39 +38,37 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
     const getPreviewText = () => {
         if (character.latestSwipe === undefined || !character.latestName)
             return t('character.list.emptyStates.noMessages')
-        return character.latestName + ':  ' + character.latestSwipe.trim()
+        return character.latestName + ': ' + character.latestSwipe.trim()
     }
 
     return (
-        <View>
+        <View style={{ flex: 1 }}>
             <CharacterEditPopup
                 character={character}
                 setNowLoading={setNowLoading}
                 nowLoading={nowLoading}>
-                <View style={styles.longButtonContainer}>
+                <View style={styles.card}>
                     <Avatar
                         targetImage={Characters.getImageDir(character.image_id)}
-                        style={styles.avatar}
+                        style={styles.cover}
+                        contentFit="cover"
                     />
-
-                    <View style={{ flex: 1, paddingLeft: 12 }}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                            <Text style={styles.nametag} numberOfLines={2}>
-                                {character.name}
-                            </Text>
-                            <Text style={styles.timestamp}>
-                                {getFriendlyTimeStamp(character.last_modified)}
-                            </Text>
-                        </View>
-                        <Text numberOfLines={1} ellipsizeMode="tail" style={styles.previewText}>
+                    <View style={styles.info}>
+                        <Text style={styles.name} numberOfLines={1}>
+                            {character.name}
+                        </Text>
+                        <Text style={styles.preview} numberOfLines={2} ellipsizeMode="tail">
                             {getPreviewText()}
+                        </Text>
+                        <Text style={styles.timestamp} numberOfLines={1}>
+                            {getFriendlyTimeStamp(character.last_modified)}
                         </Text>
                     </View>
                 </View>
             </CharacterEditPopup>
             <CharacterListingTags
                 tags={character.tags}
-                showTags={showTags!}
+                showTags={Boolean(showTags)}
                 onPress={(tag: string) => {
                     setShowSearch(true)
                     if (tagFilter.includes(tag)) return
@@ -84,42 +82,43 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
 export default CharacterListing
 
 const useStyles = () => {
-    const { color, spacing, borderRadius, fontSize } = Theme.useTheme()
+    const { color } = Theme.useTheme()
 
     return StyleSheet.create({
-        longButtonContainer: {
-            flexDirection: 'row',
-            backgroundColor: color.neutral._100,
-            borderRadius: borderRadius.m,
-            flex: 1,
-            paddingVertical: spacing.l,
-            paddingHorizontal: spacing.xl,
-        },
-
-        avatar: {
-            width: 48,
-            height: 48,
-            borderRadius: borderRadius.l,
-            backgroundColor: color.neutral._200,
-            borderColor: color.neutral._200,
+        card: {
+            overflow: 'hidden',
+            borderRadius: 18,
             borderWidth: 1,
+            borderColor: color.neutral._400,
+            backgroundColor: color.neutral._200,
         },
-
-        nametag: {
-            flex: 1,
-            fontSize: fontSize.l,
-            fontWeight: '500',
+        cover: {
+            width: '100%',
+            aspectRatio: 0.94,
+            backgroundColor: color.neutral._300,
+        },
+        info: {
+            minHeight: 110,
+            paddingHorizontal: 12,
+            paddingTop: 12,
+            paddingBottom: 14,
+        },
+        name: {
+            fontSize: 16,
+            fontWeight: '700',
             color: color.text._100,
         },
-
-        timestamp: {
-            fontSize: fontSize.s,
+        preview: {
+            fontSize: 12,
             color: color.text._400,
+            lineHeight: 18,
+            marginTop: 6,
+            minHeight: 36,
         },
-
-        previewText: {
-            marginTop: spacing.s,
-            color: color.text._500,
+        timestamp: {
+            fontSize: 10,
+            color: color.primary._700,
+            marginTop: 9,
         },
     })
 }
