@@ -1,3 +1,4 @@
+// Private Roleplay v0.5 - verified TypeScript, request APK build
 import { FlashList } from '@shopify/flash-list'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
