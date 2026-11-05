@@ -11,6 +11,7 @@ import ThemedButton from '@components/buttons/ThemedButton'
 import Alert from '@components/views/Alert'
 import { ChatSwipe } from '@db/schema'
 import { AppSettings } from '@lib/constants/GlobalValues'
+import { Tokenizer } from '@lib/engine/Tokenizer'
 import { useBackAction } from '@lib/hooks/BackAction'
 import { AuthorNotes } from '@lib/state/AuthorNotes'
 import { Chats, useInference } from '@lib/state/Chat'
@@ -108,9 +109,13 @@ const ChatQuickActions: React.FC<ChatActionProps> = ({
                 {
                     label: t('chat.quickActions.createNote.button'),
                     onPress: async () => {
+                        const excerpt = swipe.swipe
+                        const counted = await Tokenizer.getTokenizer()(excerpt).catch(() => 0)
                         const newNoteId = await AuthorNotes.db.mutate.createNote({
                             chat_id: chatId,
-                            content: swipe.swipe,
+                            name: 'Remembered scene',
+                            content: excerpt,
+                            token_length: Math.max(counted, Math.ceil(excerpt.length / 2)),
                             depth: 1,
                         })
                         if (!newNoteId) {

@@ -1,4 +1,5 @@
 import { useRouter } from 'expo-router'
+import { useState } from 'react'
 import { Pressable, Text, View } from 'react-native'
 
 import Avatar from '@components/views/Avatar'
@@ -7,10 +8,13 @@ import { useActiveProvider } from '@lib/hooks/ActiveProvider'
 import { Characters } from '@lib/state/Characters'
 import { Theme } from '@lib/theme/ThemeManager'
 
+import StoryMemorySheet from './StoryMemorySheet'
+
 /** Presentation only. Model loading and inference remain owned by ChatterUI. */
 const ChatIdentityBar = () => {
     const { color } = Theme.useTheme()
     const router = useRouter()
+    const [memoryOpen, setMemoryOpen] = useState(false)
     const { available, mode } = useActiveProvider()
     const card = Characters.useCharacterStore((state) => state.card)
     const localModelName = Llama.useLlamaModelStore((state) => state.model?.name)
@@ -24,6 +28,7 @@ const ChatIdentityBar = () => {
           : 'PROVIDER CONNECTED'
 
     return (
+        <>
         <View
             style={{
                 marginHorizontal: 14,
@@ -93,7 +98,25 @@ const ChatIdentityBar = () => {
                     {status}
                 </Text>
             </Pressable>
+            <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Open Story Memory"
+                onPress={() => setMemoryOpen(true)}
+                style={{
+                    borderRadius: 16,
+                    borderWidth: 1,
+                    borderColor: color.primary._400,
+                    paddingVertical: 9,
+                    paddingHorizontal: 7,
+                    backgroundColor: color.neutral._300,
+                }}>
+                <Text style={{ color: color.primary._800, fontSize: 10, fontWeight: '800' }}>
+                    MEMORY
+                </Text>
+            </Pressable>
         </View>
+        <StoryMemorySheet visible={memoryOpen} onClose={() => setMemoryOpen(false)} />
+        </>
     )
 }
 

@@ -103,6 +103,11 @@ const ChatsDrawer = () => {
                     />
                 )}
             </Animated.View>
+            {!showSearchResults && !showSearchBar && (
+                <Text style={{ color: color.text._500, fontSize: 12, lineHeight: 18, marginVertical: 8 }}>
+                    Tap to continue. Long press a story to rename, clone, export or delete it.
+                </Text>
+            )}
             {!showSearchResults && (
                 <>
                     <Animated.View

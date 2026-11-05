@@ -30,6 +30,7 @@ import { useAvatarViewerStore } from '@lib/state/components/AvatarViewer'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import CharacterEditorGuide, { EditorChapter } from './CharacterEditorGuide'
+import CharacterConsistencyGuide from './CharacterConsistencyGuide'
 
 const ChracterEditorScreen = () => {
     const { t } = useTranslation()
@@ -375,6 +376,7 @@ const ChracterEditorScreen = () => {
                             </View>
                         </View>
 
+                        <CharacterConsistencyGuide description={characterCard.description} personality={characterCard.personality} scenario={characterCard.scenario} firstMessage={characterCard.first_mes} exampleMessages={characterCard.mes_example} />
                         <EditorChapter title="CORE CHARACTER" description="Describe the character, voice, appearance and important details." />
                         <ThemedTextInput
                             scrollEnabled
