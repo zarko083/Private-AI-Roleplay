@@ -1,5 +1,6 @@
 import { AuthorNotes } from '@lib/state/AuthorNotes'
 import { Chats } from '@lib/state/Chat'
+import { STORY_MEMORY_NOTE_NAME } from '@lib/state/StoryMemory'
 import { replaceMacros } from '@lib/state/Macros'
 
 import createLorebookDataSource from './lorebookSource'
@@ -63,10 +64,12 @@ const createAuthorNotesDataSource = async (): Promise<DataSource | undefined> =>
         content: replaceMacros(item.content),
         source: AUTHOR_NOTE_NAME,
         tokenLength: item.token_length ?? 0,
-        position: {
-            type: 'index',
-            location: item.depth ?? 0,
-        },
+        // The pinned continuity memory is a system-level fact record, not a
+        // synthetic user turn. Give it priority over conflicting old dialogue.
+        // Other Author Notes retain their original depth behavior.
+        position: item.name === STORY_MEMORY_NOTE_NAME
+            ? { type: 'relative' as const, location: 'afterSystem' as const }
+            : { type: 'index' as const, location: item.depth ?? 0 },
     }))
 
     return {
