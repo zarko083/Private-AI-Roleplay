@@ -1,3 +1,4 @@
+// Private Roleplay v0.5.1: validated memory-priority patch; Android release request.
 import { AuthorNotes } from '@lib/state/AuthorNotes'
 import { Chats } from '@lib/state/Chat'
 import { STORY_MEMORY_NOTE_NAME } from '@lib/state/StoryMemory'
