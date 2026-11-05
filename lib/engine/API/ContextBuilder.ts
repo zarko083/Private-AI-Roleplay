@@ -1,3 +1,4 @@
+// Private Roleplay v0.5.2 APK validation: memory is appended to the latest user prompt.
 import { t } from 'i18next'
 
 import { AppSettings } from '@lib/constants/GlobalValues'
