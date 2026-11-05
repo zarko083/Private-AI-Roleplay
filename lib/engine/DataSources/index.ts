@@ -65,11 +65,11 @@ const createAuthorNotesDataSource = async (): Promise<DataSource | undefined> =>
         content: replaceMacros(item.content),
         source: AUTHOR_NOTE_NAME,
         tokenLength: item.token_length ?? 0,
-        // The pinned continuity memory is a system-level fact record, not a
-        // synthetic user turn. Give it priority over conflicting old dialogue.
-        // Other Author Notes retain their original depth behavior.
+        // Inject pinned story facts immediately before the latest user question.
+        // Gemma 2's user/model template does not have a dedicated system turn.
+        // Ordinary Author Notes continue to follow their configured depth.
         position: item.name === STORY_MEMORY_NOTE_NAME
-            ? { type: 'relative' as const, location: 'afterSystem' as const }
+            ? { type: 'relative' as const, location: 'insideLatestUser' as const }
             : { type: 'index' as const, location: item.depth ?? 0 },
     }))
 
