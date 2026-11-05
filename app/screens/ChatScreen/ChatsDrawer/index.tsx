@@ -21,6 +21,7 @@ import ChatDrawerSearchItem from './ChatDrawerSearchItem'
 
 const ChatsDrawer = () => {
     const styles = useStyles()
+    const { color } = Theme.useTheme()
     const { t } = useTranslation()
     const { show, setShow } = Drawer.useDrawerStore(
         useShallow((state) => ({
