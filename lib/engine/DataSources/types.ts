@@ -7,7 +7,7 @@ export type DataSourceResult = {
     position:
         | {
               type: 'relative'
-              location: 'afterLast' | 'beforeLast' | 'afterSystem'
+              location: 'afterLast' | 'beforeLast' | 'afterSystem' | 'insideLatestUser'
           }
         | {
               type: 'index'
