@@ -318,6 +318,27 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
                 case 'afterSystem':
                     systemPrompt += '\n' + insertion.content
                     break
+
+                case 'insideLatestUser': {
+                    // Messages are held newest-first until the final reverse().
+                    // Put pinned facts in the same user turn as the latest
+                    // question. This also works with Gemma 2's two-role
+                    // (user/model) chat template.
+                    const latestUser = contextMessages.find((message) => message.role === 'user')
+                    if (latestUser) {
+                        latestUser.content =
+                            '[Established role-play facts. Use these when answering the current question. Do not invent conflicting past events.]\n' +
+                            insertion.content +
+                            '\n[End established facts]\n\n[Current user message]\n' +
+                            latestUser.content
+                        Logger.info('[ContinuityMemory] Included pinned facts in latest user prompt')
+                    } else {
+                        // No question exists yet (for example, the first greeting).
+                        systemPrompt += '\n' + insertion.content
+                        Logger.info('[ContinuityMemory] Included pinned facts in opening system prompt')
+                    }
+                    break
+                }
             }
 
             continue
