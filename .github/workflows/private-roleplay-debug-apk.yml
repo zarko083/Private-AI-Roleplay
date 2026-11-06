@@ -40,6 +40,8 @@ jobs:
         run: npm ci
       - name: Verify TypeScript
         run: npx tsc --noEmit
+      - name: Run pinned memory regression tests
+        run: npx jest lib/engine/API/PinnedMemory.test.ts --runInBand --watch=false --ci
 
   build-release-apk:
     needs: check-frontend
