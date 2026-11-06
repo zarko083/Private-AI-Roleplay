@@ -138,7 +138,7 @@ const StoryMemorySheet: React.FC<Props> = ({ visible, onClose }) => {
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                             <View style={{ flex: 1, paddingRight: 8 }}>
                                 <Text style={{ color: color.primary._800, fontSize: 11, letterSpacing: 2, fontWeight: '800' }}>
-                                    PRIVATE ROLEPLAY · V0.5
+                                    PRIVATE ROLEPLAY · STORY MEMORY
                                 </Text>
                                 <Text style={{ color: color.text._100, fontSize: 25, fontWeight: '800', marginTop: 6 }}>
                                     Story Memory
