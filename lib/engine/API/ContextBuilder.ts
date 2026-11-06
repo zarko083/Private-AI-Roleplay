@@ -14,6 +14,7 @@ import { readBase64Async } from '@lib/utils/File'
 import { Macro } from '@lib/utils/Macros'
 
 import { APIConfiguration, APIValues } from './APIBuilder.types'
+import { formatPinnedMemoryPrompt } from './PinnedMemory'
 import type { DataSource, DataSourceResult } from '../DataSources/types'
 
 export type MessageLoader = {
@@ -292,6 +293,8 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
 
     await runDataSources(sortedDataSources)
 
+    const pinnedFacts: string[] = []
+
     const insertMessage = (index: number, message: ContextMessage) => {
         contextMessages.splice(index, 0, message)
     }
@@ -320,26 +323,12 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
                     systemPrompt += '\n' + insertion.content
                     break
 
-                case 'insideLatestUser': {
-                    // Messages are held newest-first until the final reverse().
-                    // Put pinned facts in the same user turn as the latest
-                    // question. This also works with Gemma 2's two-role
-                    // (user/model) chat template.
-                    const latestUser = contextMessages.find((message) => message.role === 'user')
-                    if (latestUser) {
-                        latestUser.content =
-                            '[Established role-play facts. Use these when answering the current question. Do not invent conflicting past events.]\n' +
-                            insertion.content +
-                            '\n[End established facts]\n\n[Current user message]\n' +
-                            latestUser.content
-                        Logger.info('[ContinuityMemory] Included pinned facts in latest user prompt')
-                    } else {
-                        // No question exists yet (for example, the first greeting).
-                        systemPrompt += '\n' + insertion.content
-                        Logger.info('[ContinuityMemory] Included pinned facts in opening system prompt')
-                    }
+                case 'insideLatestUser':
+                    // Collect every pinned note first and format one combined
+                    // block. The previous implementation nested user labels when
+                    // both the story and character memories were present.
+                    pinnedFacts.push(insertion.content)
                     break
-                }
             }
 
             continue
@@ -351,6 +340,20 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
             contextMessages.unshift(syntheticMessage)
         } else {
             insertMessage(index, syntheticMessage)
+        }
+    }
+
+    if (pinnedFacts.length > 0) {
+        // Reversed message collection means find() locates the latest user turn.
+        // A single user-message block works with Gemma's two-role chat template.
+        const latestUser = contextMessages.find((message) => message.role === 'user')
+        if (latestUser) {
+            latestUser.content = formatPinnedMemoryPrompt(pinnedFacts, latestUser.content)
+            Logger.info(`[ContinuityMemory] Included ${pinnedFacts.length} pinned note(s) in latest user prompt`)
+        } else {
+            // Initial greetings may have no preceding user turn.
+            systemPrompt += '\\n' + pinnedFacts.join('\\n')
+            Logger.info(`[ContinuityMemory] Included ${pinnedFacts.length} pinned note(s) in opening prompt`)
         }
     }
 
