@@ -63,7 +63,16 @@ const StoryMemorySheet: React.FC<Props> = ({ visible, onClose }) => {
         setMessage('')
         try {
             await StoryMemory.save(scope, ownerId, draft)
-            setMessage(draft.trim() ? 'Memory saved for future replies.' : 'Memory cleared.')
+            // Confirm persistence instead of reporting success for an unverified write.
+            const persisted = await StoryMemory.load(scope, ownerId)
+            if (persisted !== draft.trim().slice(0, MAX_MEMORY_CHARS)) {
+                throw new Error('Memory read-back did not match the saved text.')
+            }
+            setMessage(
+                persisted
+                    ? 'Memory verified on this device. It will be included in the next reply.'
+                    : 'Memory cleared and verified on this device.'
+            )
         } catch (error) {
             setMessage(`Save failed: ${String(error)}`)
         } finally {
