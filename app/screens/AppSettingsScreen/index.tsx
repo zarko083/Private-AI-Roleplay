@@ -86,7 +86,7 @@ const AppSettingsMenu = () => {
                 <LanguageSettings />
             </SettingsGroup>
             <Text style={{ textAlign: 'center', color: color.text._500, fontSize: 11, marginTop: 20 }}>
-                Private Roleplay · Frontend v0.4
+                Private Roleplay · Offline Edition
             </Text>
         </KeyboardAwareScrollView>
     )
