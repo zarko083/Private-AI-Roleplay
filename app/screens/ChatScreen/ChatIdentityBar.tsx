@@ -21,11 +21,11 @@ const ChatIdentityBar = () => {
 
     const status = !available
         ? mode === 'local'
-            ? 'SELECT LOCAL MODEL'
-            : 'CONNECT PROVIDER'
+            ? 'LOAD MODEL'
+            : 'CONNECT API'
         : mode === 'local'
           ? 'LOCAL READY'
-          : 'PROVIDER CONNECTED'
+          : 'API READY'
 
     return (
         <>
@@ -42,24 +42,27 @@ const ChatIdentityBar = () => {
                 backgroundColor: color.neutral._200,
                 flexDirection: 'row',
                 alignItems: 'center',
-                columnGap: 10,
+                columnGap: 8,
             }}>
             <Avatar
                 targetImage={Characters.getImageDir(card?.image_id ?? 0)}
                 style={{ width: 43, height: 43, borderRadius: 14 }}
                 contentFit="cover"
             />
-            <View style={{ flex: 1, minWidth: 0 }}>
+            <View style={{ flex: 1, minWidth: 0, justifyContent: 'center' }}>
                 <Text
                     numberOfLines={1}
                     style={{ fontSize: 16, fontWeight: '700', color: color.text._100 }}>
                     {card?.name || 'Your story'}
                 </Text>
                 <Text
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                    accessibilityLabel={mode === 'local' && localModelName ? localModelName : 'Private conversation'}
                     style={{
                         fontSize: 10,
                         marginTop: 3,
-                        letterSpacing: 1.1,
+                        letterSpacing: 0.3,
                         fontWeight: '700',
                         color: color.text._500,
                     }}>
@@ -77,18 +80,18 @@ const ChatIdentityBar = () => {
                     )
                 }
                 style={{
-                    flexShrink: 1,
+                    flexShrink: 0,
                     borderRadius: 20,
                     borderWidth: 1,
                     borderColor: available ? color.primary._400 : color.neutral._400,
                     backgroundColor: available ? color.primary._100 : color.neutral._300,
-                    paddingHorizontal: 10,
+                    paddingHorizontal: 8,
                     paddingVertical: 8,
                 }}>
                 <Text
                     numberOfLines={2}
                     style={{
-                        maxWidth: 94,
+                        maxWidth: 70,
                         textAlign: 'center',
                         fontWeight: '700',
                         fontSize: 9,
