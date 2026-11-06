@@ -352,7 +352,7 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
             Logger.info(`[ContinuityMemory] Included ${pinnedFacts.length} pinned note(s) in latest user prompt`)
         } else {
             // Initial greetings may have no preceding user turn.
-            systemPrompt += '\\n' + pinnedFacts.join('\\n')
+            systemPrompt += '\n' + pinnedFacts.join('\n')
             Logger.info(`[ContinuityMemory] Included ${pinnedFacts.length} pinned note(s) in opening prompt`)
         }
     }
