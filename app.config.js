@@ -2,7 +2,7 @@ const IS_DEV = process.env.APP_VARIANT === 'development'
 
 module.exports = {
     expo: {
-        name: IS_DEV ? 'ChatterUI (DEV)' : 'ChatterUI',
+        name: IS_DEV ? 'Private Roleplay (DEV)' : 'Private Roleplay',
         newArchEnabled: true,
         slug: 'ChatterUI',
         version: '0.10.1',
