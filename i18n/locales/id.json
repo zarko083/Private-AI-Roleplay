@@ -12,8 +12,8 @@
         "logsReminder": "Jangan lupa sertakan log",
         "reportIssue": "Punya masalah? Laporkan di sini:",
         "support": {
-            "button": "Dukung ChatterUI",
-            "label": "Donasi untuk ChatterUI di sini:"
+            "button": "Dukung PARC",
+            "label": "Donasi untuk PARC di sini:"
         },
         "versionPrefix": "v"
     },
@@ -341,7 +341,7 @@
             }
         },
         "brand": {
-            "name": "ChatterUI"
+            "name": "PARC"
         },
         "emptyStates": {
             "noItems": "Tidak Ada Item"
@@ -593,7 +593,7 @@
             "title": "Teks Tersembunyi"
         },
         "localtemplate": {
-            "description": "Saat dalam Mode Lokal, ChatterUI secara otomatis menggunakan template instruct yang disediakan oleh model yang dimuat. Nonaktifkan ini jika Anda ingin pesan diformat menggunakan Instruct. Namun Prompt Sistem selalu digunakan.",
+            "description": "Saat dalam Mode Lokal, PARC secara otomatis menggunakan template instruct yang disediakan oleh model yang dimuat. Nonaktifkan ini jika Anda ingin pesan diformat menggunakan Instruct. Namun Prompt Sistem selalu digunakan.",
             "label": "Gunakan Template Model Lokal Bawaan",
             "title": "Template Lokal"
         },
@@ -678,7 +678,7 @@
         "backenddev": "Perangkat Backend",
         "batch": "Batch",
         "contextshift": "Pergeseran Konteks",
-        "copymodel": "Salin Model ke ChatterUI",
+        "copymodel": "Salin Model ke PARC",
         "empty": "Tidak Ditemukan Model. Coba Impor Beberapa!",
         "externalmodel": "Gunakan Model Eksternal",
         "gpulayers": "Lapisan GPU",
@@ -793,8 +793,8 @@
             "title": "Manajemen Karakter"
         },
         "chat": {
-            "askInChatterUI": "Tanya di ChatterUI",
-            "askInChatterUIDescription": "Gunakan prompt ChatterUI untuk maksud teks, bukan perilaku keyboard bawaan.",
+            "askInChatterUI": "Tanya di PARC",
+            "askInChatterUIDescription": "Gunakan prompt PARC untuk maksud teks, bukan perilaku keyboard bawaan.",
             "autoGenerateTitles": "Hasilkan judul chat otomatis",
             "autoGenerateTitlesDescription": "Buat judul untuk chat baru secara otomatis.",
             "autoLoadUser": "Muat pengguna yang dipilih secara otomatis",
