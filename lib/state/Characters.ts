@@ -529,40 +529,41 @@ export namespace Characters {
                         })
                     )
                     if (card.tags) {
-                        // create { tag: string }[]
-                        const newTags = card.tags
-                            .filter((item) => item.tag_id === -1)
-                            .map((tag) => ({ tag: tag.tag.tag }))
-
-                        // New tags are marked with -1
-                        const currentTagIDs = card.tags
-                            .filter((item) => item.tag_id !== -1)
-                            .map((item) => ({
-                                character_id: card.id,
-                                tag_id: item.tag.id,
-                            }))
-                        const newTagIDs: (typeof characterTags.$inferSelect)[] = []
-
-                        // optimistically add missing tags
-                        if (newTags.length !== 0) {
+                        // Resolve all new tags from the database after insert.
+                        // A tag can already exist (another card or an imported card),
+                        // in which case INSERT OR IGNORE returns no inserted row.
+                        // Looking up the IDs avoids silently losing those tags.
+                        const newNames = [...new Set(
+                            card.tags
+                                .filter((item) => item.tag_id === -1)
+                                .map((item) => item.tag.tag.trim())
+                                .filter(Boolean)
+                        )]
+                        if (newNames.length > 0) {
                             await database
                                 .insert(tags)
-                                .values(newTags)
+                                .values(newNames.map((tag) => ({ tag })))
                                 .onConflictDoNothing()
-                                .returning({
-                                    id: tags.id,
-                                })
-                                // concat new tags to tagids
-                                .then((result) => {
-                                    newTagIDs.push(
-                                        ...result.map((item) => ({
-                                            character_id: card.id,
-                                            tag_id: item.id,
-                                        }))
-                                    )
-                                })
                         }
-                        const mergedTags = [...currentTagIDs, ...newTagIDs]
+
+                        const existingLinks = card.tags
+                            .filter((item) => item.tag_id !== -1)
+                            .map((item) => ({
+                                character_id: cardID,
+                                tag_id: item.tag.id,
+                            }))
+                        const resolved = newNames.length > 0
+                            ? await database
+                                .select({ id: tags.id })
+                                .from(tags)
+                                .where(inArray(tags.tag, newNames))
+                            : []
+                        const mergedTags = [...existingLinks, ...resolved.map((item) => ({
+                            character_id: cardID,
+                            tag_id: item.id,
+                        }))].filter((item, index, all) =>
+                            all.findIndex((other) => other.tag_id === item.tag_id) === index
+                        )
                         if (mergedTags.length !== 0)
                             await database
                                 .insert(characterTags)
@@ -595,6 +596,7 @@ export namespace Characters {
                     }
                 } catch (e) {
                     Logger.warn(`${e}`)
+                    throw e
                 }
             }
 
