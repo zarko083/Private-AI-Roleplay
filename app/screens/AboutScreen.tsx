@@ -4,7 +4,6 @@ import { Image, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-
 import { useMMKVBoolean } from 'react-native-mmkv'
 
 import appConfig from '@appconfig'
-import SupportButton from '@components/buttons/SupportButton'
 import ThemedButton from '@components/buttons/ThemedButton'
 import HeaderTitle from '@components/views/HeaderTitle'
 import { AppSettings } from '@lib/constants/GlobalValues'
@@ -32,10 +31,10 @@ const AboutScreen = () => {
         <View style={styles.container}>
             <HeaderTitle title={t('common.navigation.about')} />
             <TouchableOpacity activeOpacity={0.8} onPress={updateCounter}>
-                <Image source={require('../../assets/images/icon.png')} style={styles.icon} />
+                <Image source={require('../../assets/images/parc-icon.png')} style={styles.icon} />
             </TouchableOpacity>
 
-            <Text style={styles.titleText}>{t('common.brand.name')}</Text>
+            <Text style={styles.titleText}>PARC Studio</Text>
             <Text style={styles.subtitleText}>
                 {t('common.labels.version')} {version}{' '}
                 {devMode && `[${t('common.labels.devMode')}]`}
@@ -55,29 +54,28 @@ const AboutScreen = () => {
                 />
             )}
 
-            <Text style={styles.body}>{t('about.description.primary')}</Text>
-            <Text style={{ marginBottom: spacing.xl3, ...styles.body }}>
-                {t('about.description.support')}
+            <Text style={styles.body}>
+                Your personal AI roleplay studio, designed for offline use.
             </Text>
-            <Text style={{ ...styles.body, marginBottom: spacing.m }}>
-                {t('about.support.label')}
+            <Text style={{ ...styles.body, marginBottom: spacing.xl3 }}>
+                Local models, saved characters and conversations stay on your device.
             </Text>
-
-            <SupportButton />
-
-            <Text style={styles.body}>{t('about.reportIssue')}</Text>
-            <Text style={styles.subtitleText}>{t('about.logsReminder')}</Text>
-
+            <Text style={{ ...styles.subtitleText, marginBottom: spacing.m }}>
+                SOURCE & LICENCES
+            </Text>
             <ThemedButton
                 buttonStyle={{ marginTop: spacing.m }}
                 variant="secondary"
-                label="Github"
+                label="PARC Repository"
                 iconName="github"
                 iconSize={20}
                 onPress={() => {
-                    Linking.openURL('https://github.com/Vali-98/ChatterUI')
+                    Linking.openURL('https://github.com/zarko083/Private-AI-Roleplay')
                 }}
             />
+            <Text style={{ ...styles.subtitleText, marginTop: spacing.xl }}>
+                Open-source attribution and licence details are in the repository.
+            </Text>
         </View>
     )
 }
