@@ -16,6 +16,7 @@ import { Macro } from '@lib/utils/Macros'
 import { APIConfiguration, APIValues } from './APIBuilder.types'
 import { formatPinnedMemoryPrompt } from './PinnedMemory'
 import { formatIncludedNamesBlock, formatSpeakerPrefix } from './NameContext'
+import { formatRoleplayStyleBlock } from './RoleplayStyle'
 import type { DataSource, DataSourceResult } from '../DataSources/types'
 
 export type MessageLoader = {
@@ -128,6 +129,14 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
             systemPrompt += '\n' + namesBlock
             systemPromptLength += await tokenizer(namesBlock)
         }
+    }
+
+    // Character-specific writing instructions already live in the card V2 schema.
+    // Empty values preserve the previous behaviour for existing characters.
+    const styleBlock = formatRoleplayStyleBlock(character?.post_history_instructions)
+    if (styleBlock) {
+        systemPrompt += '\n' + styleBlock
+        systemPromptLength += await tokenizer(styleBlock)
     }
 
     const reservedBudget = sortedDataSources.reduce((acc, curr) => acc + curr.tokenBudget, 0)
