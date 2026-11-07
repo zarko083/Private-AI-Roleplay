@@ -14,13 +14,24 @@ Keep the original local database, GGUF engine and Android package identifier.
 
 ## Eight frontend areas
 1. **Brand:** open, close, restart and verify PARC app name, icon, splash, palette.
-2. **Character Library:** validate square 1:1 portraits, 2-column grid, sort, search and tag filter; test long names and missing portraits.
+2. **Character Library:** validate square 1:1 portraits, editorial single-column list, sort, search and tag filter; test long names and missing portraits.
 3. **Character Editor:** edit portrait, name, description, first message, alternate greeting, personality, scenario and example; save and reopen.
 4. **Chat:** type multiline text with keyboard open, send, stop, swipe/regenerate and navigate back without clipping.
 5. **Story Memory:** save and reopen Story and Character memory separately; test unsaved-close warning and successful persistence.
 6. **Model Manager:** browse/import GGUF, load model, inspect progress, switch performance presets and return to chat.
 7. **Settings:** expand all four sections, test theme selection, appearance, chat and privacy preferences; reopen to verify persisted preferences.
 8. **Visual QA:** validate tap targets, keyboard safe area, scroll bounds and portrait orientation on Galaxy S25.
+
+## PARC Studio redesign acceptance
+- [ ] Library uses the new compact masthead and single-column editorial story cards with 1:1 avatar portraits.
+- [ ] Character Editor shows five collapsible groups and a save bar outside the scroll area.
+- [ ] Image Placement opens from avatar upload, supports drag/pinch/Reset and preserves original image.
+- [ ] Chat uses the chapter identity bar, readable transcript frames and a bottom composer dock.
+- [ ] The story archive opens and resumes chats without losing messages.
+- [ ] Samplers show Essentials and Advanced panels; changing settings preserves exact values.
+- [ ] Control Centre shortcuts open Model Manager and Samplers.
+- [ ] Local model management, Settings and User Persona retain their existing data and actions.
+- [ ] On-device UI review, not TypeScript alone, is required before sign-off.
 
 ## Safety and runtime checks
 - Export a database backup before installing any new APK.

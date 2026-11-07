@@ -59,10 +59,10 @@ const ChatSettings = () => {
             />
 
             <ThemedSwitch
-                label={t('settings.chat.askInChatterUI')}
+                label="Ask in PARC"
                 value={textIntent}
                 onChangeValue={setTextIntent}
-                description={t('settings.chat.askInChatterUIDescription')}
+                description="Share selected text from other Android apps into PARC."
             />
 
             <ThemedButton
