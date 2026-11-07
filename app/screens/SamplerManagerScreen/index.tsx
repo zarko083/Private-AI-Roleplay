@@ -26,6 +26,7 @@ import { Theme } from '@lib/theme/ThemeManager'
 import { saveStringToDownload } from '@lib/utils/File'
 
 import ContextLimitPreview from './ContextLimitPreview'
+import ParcSamplerGroup from './ParcSamplerGroup'
 
 const SamplerManagerScreen = () => {
     const { t } = useTranslation()
@@ -99,90 +100,14 @@ const SamplerManagerScreen = () => {
 
     const samplerList = getSamplerList()
 
-    const headerRight = () => (
-        <ContextMenu
-            triggerIcon="setting"
-            triggerIconSize={24}
-            placement="bottom"
-            buttons={[
-                {
-                    label: t('sampler.create'),
-                    icon: 'file-add',
-                    onPress: (close) => {
-                        newSamplerInputRef.current?.open()
-                        close()
-                    },
-                },
-                {
-                    label: t('sampler.export'),
-                    icon: 'download',
-                    onPress: (close) => {
-                        handleExportSampler()
-                        close()
-                    },
-                },
-                /*{
-                    label: 'Import Sampler',
-                    icon: 'upload',
-                    onPress: (close) => {
-                        handleImportSampler()
-                        close()
-                    },
-                },*/
-                {
-                    label: t('sampler.delete'),
-                    icon: 'delete',
-                    onPress: (close) => {
-                        if (handleDeleteSampler()) close()
-                    },
-                    variant: 'warning',
-                },
-            ]}
-        />
-    )
 
-    return (
-        <SafeAreaView edges={['bottom']} style={{ flex: 1 }} key={currentConfig.name}>
-            <InputSheet
-                title={t('sampler.new')}
-                ref={newSamplerInputRef}
-                onConfirm={(text: string) => {
-                    if (text === '') {
-                        Logger.errorToast(t('sampler.toast.emptyname'))
-                        return
-                    }
-
-                    for (const item of configList)
-                        if (item.name === text) {
-                            Logger.errorToast(t('sampler.toast.exists'))
-                            return
-                        }
-                    addSamplerConfig({ name: text, data: currentConfig.data })
-                }}
-            />
-
-            <HeaderTitle title={t('sampler.title')} />
-            <HeaderButton headerRight={headerRight} />
-
-            <DropdownSheet
-                containerStyle={{ marginHorizontal: spacing.xl, paddingVertical: spacing.m }}
-                selected={currentConfig}
-                data={configList}
-                onChangeValue={(item) => {
-                    if (item.name === currentConfig.name) return
-                    changeConfig(configList.indexOf(item))
-                }}
-                labelExtractor={(item) => item.name}
-            />
-
-            {samplerList.length !== 0 && currentConfig && (
-                <KeyboardAwareScrollView contentContainerStyle={styles.scrollContainer}>
-                    {samplerList.some((item) => item.samplerID === SamplerID.GENERATED_LENGTH) && (
-                        <ContextLimitPreview
-                            generatedLength={currentConfig.data[SamplerID.GENERATED_LENGTH]}
-                        />
-                    )}
-                    {samplerList.map((item) => {
+    const essentialSamplers = new Set<string>([
+        SamplerID.GENERATED_LENGTH, SamplerID.TEMPERATURE, SamplerID.TOP_P,
+        SamplerID.TOP_K, SamplerID.MIN_P,
+    ])
+    const essentialItems = samplerList.filter((item) => essentialSamplers.has(item.samplerID))
+    const advancedItems = samplerList.filter((item) => !essentialSamplers.has(item.samplerID))
+    const renderSamplers = (items: APISampler[]) => items.map((item) => {
                         const samplerItem = Samplers?.[item.samplerID]
                         if (!samplerItem)
                             return (
@@ -278,7 +203,121 @@ const SamplerManagerScreen = () => {
                                     <Text style={styles.warningText}>{t('sampler.invalid')}</Text>
                                 )
                         }
-                    })}
+    })
+
+    const headerRight = () => (
+        <ContextMenu
+            triggerIcon="setting"
+            triggerIconSize={24}
+            placement="bottom"
+            buttons={[
+                {
+                    label: t('sampler.create'),
+                    icon: 'file-add',
+                    onPress: (close) => {
+                        newSamplerInputRef.current?.open()
+                        close()
+                    },
+                },
+                {
+                    label: t('sampler.export'),
+                    icon: 'download',
+                    onPress: (close) => {
+                        handleExportSampler()
+                        close()
+                    },
+                },
+                /*{
+                    label: 'Import Sampler',
+                    icon: 'upload',
+                    onPress: (close) => {
+                        handleImportSampler()
+                        close()
+                    },
+                },*/
+                {
+                    label: t('sampler.delete'),
+                    icon: 'delete',
+                    onPress: (close) => {
+                        if (handleDeleteSampler()) close()
+                    },
+                    variant: 'warning',
+                },
+            ]}
+        />
+    )
+
+    return (
+        <SafeAreaView edges={['bottom']} style={{ flex: 1, backgroundColor: '#100D17' }} key={currentConfig.name}>
+            <InputSheet
+                title={t('sampler.new')}
+                ref={newSamplerInputRef}
+                onConfirm={(text: string) => {
+                    if (text === '') {
+                        Logger.errorToast(t('sampler.toast.emptyname'))
+                        return
+                    }
+
+                    for (const item of configList)
+                        if (item.name === text) {
+                            Logger.errorToast(t('sampler.toast.exists'))
+                            return
+                        }
+                    addSamplerConfig({ name: text, data: currentConfig.data })
+                }}
+            />
+
+            <HeaderTitle title={t('sampler.title')} />
+            <HeaderButton headerRight={headerRight} />
+
+            <View style={{
+                marginHorizontal: spacing.xl, marginTop: 14, marginBottom: 5,
+            }}>
+                <Text style={{
+                    fontSize: 10, fontWeight: '900', letterSpacing: 2,
+                    color: '#98E8DE',
+                }}>PARC / GENERATION LAB</Text>
+                <Text style={{
+                    fontSize: 21, fontWeight: '800', letterSpacing: -0.5,
+                    color: '#F8F3FA', marginTop: 6,
+                }}>Tune your story</Text>
+                <Text style={{
+                    fontSize: 12, lineHeight: 17,
+                    color: '#A896B2', marginTop: 4,
+                }}>Your preset controls response style and length.</Text>
+            </View>
+            <DropdownSheet
+                containerStyle={{ marginHorizontal: spacing.xl, paddingVertical: spacing.m }}
+                selected={currentConfig}
+                data={configList}
+                onChangeValue={(item) => {
+                    if (item.name === currentConfig.name) return
+                    changeConfig(configList.indexOf(item))
+                }}
+                labelExtractor={(item) => item.name}
+            />
+
+            {samplerList.length !== 0 && currentConfig && (
+                <KeyboardAwareScrollView contentContainerStyle={styles.scrollContainer}>
+                    {samplerList.some((item) => item.samplerID === SamplerID.GENERATED_LENGTH) && (
+                        <ContextLimitPreview
+                            generatedLength={currentConfig.data[SamplerID.GENERATED_LENGTH]}
+                        />
+                    )}
+                    <ParcSamplerGroup
+                        title="Essentials"
+                        subtitle="Response length, creativity and focus"
+                        count={essentialItems.length}
+                        initiallyOpen>
+                        {renderSamplers(essentialItems)}
+                    </ParcSamplerGroup>
+                    <ParcSamplerGroup
+                        title="Advanced tuning"
+                        subtitle="Repetition, control and expert parameters"
+                        count={advancedItems.length}
+                        initiallyOpen={essentialItems.length === 0}>
+                        {renderSamplers(advancedItems)}
+                    </ParcSamplerGroup>
                 </KeyboardAwareScrollView>
             )}
             {samplerList.length === 0 && (
@@ -306,8 +345,9 @@ const useStyles = () => {
     return StyleSheet.create({
         scrollContainer: {
             paddingHorizontal: spacing.xl,
-            paddingVertical: spacing.xl2,
-            rowGap: spacing.xl,
+            paddingVertical: spacing.l,
+            paddingBottom: spacing.xl2,
+            rowGap: 12,
         },
 
         dropdownContainer: {
