@@ -568,13 +568,7 @@ const ChracterEditorScreen = () => {
 
                         <ParcTagPicker
                             label={t('character.editor.fields.tags')}
-                            containerStyle={styles.input}
-                            suggestions={data.data
-                                .map((item) => item.tag)
-                                .filter(
-                                    (a) => !characterCard?.tags.some((item) => item.tag.tag === a)
-                                )}
-                            showSuggestionsOnEmpty
+                            availableTags={data.data.map((item) => item.tag)}
                             value={characterCard?.tags.map((item) => item.tag.tag) ?? []}
                             setValue={(value) => {
                                 const newTags = value
