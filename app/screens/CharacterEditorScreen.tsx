@@ -32,7 +32,8 @@ import { useAvatarPlacementStore } from '@lib/state/AvatarPlacement'
 import type { AvatarPlacement } from '@lib/utils/AvatarPlacement'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
-import CharacterEditorGuide, { EditorChapter } from './CharacterEditorGuide'
+import CharacterEditorGuide from './CharacterEditorGuide'
+import ParcEditorSection from './ParcEditorSection'
 import CharacterConsistencyGuide from './CharacterConsistencyGuide'
 
 const ChracterEditorScreen = () => {
@@ -335,7 +336,7 @@ const ChracterEditorScreen = () => {
                         keyboardShouldPersistTaps="always"
                         contentContainerStyle={{ rowGap: 12, paddingBottom: 36 }}>
                         <CharacterEditorGuide name={characterCard.name} descriptionTokens={descriptionTokens} edited={edited} />
-                        <EditorChapter title="IDENTITY" description="Portrait and character name" />
+                        <ParcEditorSection index="01" title="Identity" subtitle="Portrait, framing and name" initiallyOpen>
                         <View style={styles.characterHeader}>
                             <ContextMenu
                                 placement="right"
@@ -412,16 +413,7 @@ const ChracterEditorScreen = () => {
                             </ContextMenu>
 
                             <View style={styles.characterHeaderInfo}>
-                                <View style={styles.buttonContainer}>
-                                    <ThemedButton
-                                        disabled={!edited}
-                                        iconName="save"
-                                        iconSize={20}
-                                        label={t('common.actions.save')}
-                                        onPress={handleSaveCard}
-                                        variant={edited ? 'secondary' : 'disabled'}
-                                    />
-                                </View>
+                                <Text style={{ color: color.text._400, fontSize: 11, marginBottom: 4 }}>CHARACTER NAME</Text>
                                 <ThemedTextInput
                                     onChangeText={(mes) => {
                                         setCharacterCardEdited({
@@ -434,8 +426,9 @@ const ChracterEditorScreen = () => {
                             </View>
                         </View>
 
+                        </ParcEditorSection>
                         <CharacterConsistencyGuide description={characterCard.description} personality={characterCard.personality} scenario={characterCard.scenario} firstMessage={characterCard.first_mes} exampleMessages={characterCard.mes_example} />
-                        <EditorChapter title="CORE CHARACTER" description="Identity, behaviour and defining details" />
+                        <ParcEditorSection index="02" title="Character profile" subtitle="Identity, backstory and appearance">
                         <ThemedTextInput
                             scrollEnabled
                             label={t('character.editor.metrics.descriptionTokens', {
@@ -453,7 +446,8 @@ const ChracterEditorScreen = () => {
                             value={characterCard?.description}
                         />
 
-                        <EditorChapter title="OPENING SCENE" description="Greetings for new conversations" />
+                        </ParcEditorSection>
+                        <ParcEditorSection index="03" title="Opening scene" subtitle="First message and greetings">
                         <ThemedTextInput
                             label={t('character.editor.fields.firstMessage')}
                             multiline
@@ -576,7 +570,8 @@ const ChracterEditorScreen = () => {
                             )}
                         </View>
 
-                        <EditorChapter title="WORLD & BEHAVIOUR" description="Personality, scenario and searchable tags" />
+                        </ParcEditorSection>
+                        <ParcEditorSection index="04" title="World & behaviour" subtitle="Personality, situation and dialogue style">
                         <ThemedTextInput
                             label={t('character.editor.fields.personality')}
                             multiline
@@ -619,6 +614,8 @@ const ChracterEditorScreen = () => {
                             numberOfLines={8}
                         />
 
+                        </ParcEditorSection>
+                        <ParcEditorSection index="05" title="Discovery tags" subtitle="Find and organise your characters">
                         <ParcTagPicker
                             label={t('character.editor.fields.tags')}
                             availableTags={data.data.map((item) => item.tag)}
@@ -646,7 +643,33 @@ const ChracterEditorScreen = () => {
                                 })
                             }}
                         />
+                        </ParcEditorSection>
                     </KeyboardAwareScrollView>
+                )}
+                {characterCard && (
+                    <View style={{
+                        flexDirection: 'row', alignItems: 'center',
+                        justifyContent: 'space-between', marginHorizontal: 5,
+                        paddingHorizontal: 12, paddingVertical: 10,
+                        backgroundColor: '#21192A', borderWidth: 1,
+                        borderColor: '#50345D', borderRadius: 17, marginBottom: 7,
+                    }}>
+                        <View style={{ flex: 1, marginRight: 10 }}>
+                            <Text style={{ color: color.text._100, fontSize: 12, fontWeight: '800' }}>
+                                {edited ? 'Changes not saved' : 'Character saved'}
+                            </Text>
+                            <Text style={{ color: color.text._500, fontSize: 10, marginTop: 3 }}>
+                                {edited ? 'Save to update this card' : 'Ready for your next scene'}
+                            </Text>
+                        </View>
+                        <ThemedButton
+                            disabled={!edited}
+                            iconName="save"
+                            label={edited ? 'Save changes' : 'Saved'}
+                            variant={edited ? 'primary' : 'disabled'}
+                            onPress={handleSaveCard}
+                        />
+                    </View>
                 )}
             </ImageBackground>
         </SafeAreaView>
@@ -659,18 +682,19 @@ const useStyles = () => {
         mainContainer: {
             flex: 1,
             paddingHorizontal: spacing.m,
-            paddingTop: spacing.m,
+            paddingTop: 0,
             paddingBottom: spacing.s,
+            backgroundColor: color.neutral._100,
         },
 
         characterHeader: {
             alignContent: 'flex-start',
-            borderRadius: borderRadius.xl,
+            borderRadius: 14,
             flexDirection: 'row',
             alignItems: 'center',
-            backgroundColor: color.neutral._100,
-            paddingVertical: 12,
-            paddingHorizontal: 12,
+            backgroundColor: 'transparent',
+            paddingVertical: 6,
+            paddingHorizontal: 3,
         },
 
         characterHeaderInfo: {
@@ -695,8 +719,8 @@ const useStyles = () => {
         },
 
         avatar: {
-            width: 94,
-            height: 94,
+            width: 112,
+            height: 112,
             borderRadius: borderRadius.xl,
             borderColor: color.primary._500,
             borderWidth: 2,
