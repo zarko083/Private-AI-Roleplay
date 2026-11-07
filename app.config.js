@@ -1,3 +1,4 @@
+// PARC mobile frontend QA candidate: branded theme, assets and all major screens.
 const IS_DEV = process.env.APP_VARIANT === 'development'
 
 module.exports = {
