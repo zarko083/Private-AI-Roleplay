@@ -28,12 +28,15 @@ const Layout = () => {
                     screenOptions={{
                         headerBackButtonDisplayMode: 'minimal',
                         headerStyle: { backgroundColor: color.neutral._100 },
-                        headerTitleStyle: { color: color.text._100 },
-                        headerTintColor: color.text._100,
+                        headerTitleStyle: {
+                            color: color.text._100, fontWeight: '800',
+                            fontSize: 17, letterSpacing: -0.3,
+                        },
+                        headerTintColor: '#E9ABD9',
                         contentStyle: { backgroundColor: color.neutral._100 },
                         headerShadowVisible: false,
-                        headerTitleAlign: 'center',
-                        statusBarStyle: 'auto',
+                        headerTitleAlign: 'left',
+                        statusBarStyle: 'light',
                     }}>
                     <Stack.Screen name="index" options={{ animation: 'fade' }} />
                 </Stack>
