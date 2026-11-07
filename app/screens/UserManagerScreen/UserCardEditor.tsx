@@ -4,7 +4,7 @@ import { useNavigation } from 'expo-router'
 import { usePreventRemove } from 'expo-router/build/react-navigation'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
 import ThemedButton from '@components/buttons/ThemedButton'

@@ -331,6 +331,7 @@ const ChracterEditorScreen = () => {
 
                 {characterCard && (
                     <KeyboardAwareScrollView
+                        style={{ flex: 1 }}
                         bottomOffset={16}
                         showsVerticalScrollIndicator={false}
                         keyboardShouldPersistTaps="always"

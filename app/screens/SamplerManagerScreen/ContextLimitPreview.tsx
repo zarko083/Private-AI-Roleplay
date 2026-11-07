@@ -39,7 +39,7 @@ const ContextLimitPreview: React.FC<Props> = ({ generatedLength }) => {
             }}>
                 <View style={{
                     height: '100%', borderRadius: 7,
-                    width: (ratio * 100) + '%',
+                    width: (ratio * 100 + '%') as `${number}%`,
                     backgroundColor: '#D552A3',
                 }} />
             </View>
