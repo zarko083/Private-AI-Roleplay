@@ -1,84 +1,70 @@
 import AntDesign from '@react-native-vector-icons/ant-design/static'
-import MaterialIcons from '@react-native-vector-icons/material-icons/static'
-import React from 'react'
-import { useTranslation } from 'react-i18next'
 import { Text, View } from 'react-native'
-import * as Progress from 'react-native-progress'
 
 import { useContextLimit } from '@lib/hooks/ContextLimit'
 import { Theme } from '@lib/theme/ThemeManager'
 
-interface ContextLimitPreviewProps {
-    generatedLength: number
-}
+type Props = { generatedLength: number }
 
-const ContextLimitPreview: React.FC<ContextLimitPreviewProps> = ({ generatedLength }) => {
-    const { t } = useTranslation()
+/** Context numbers are unchanged; PARC renders them in a compact budget panel. */
+const ContextLimitPreview: React.FC<Props> = ({ generatedLength }) => {
     const { color } = Theme.useTheme()
     const contextLimit = useContextLimit()
-    const leftover = Math.max(0, contextLimit - generatedLength)
-    const limit = leftover / contextLimit
-    const warning = leftover < Math.min(2048, 0.25 * contextLimit)
-    const genLengthColor = warning ? color.error._300 : color.primary._200
+    const chatBudget = Math.max(0, contextLimit - generatedLength)
+    const ratio = contextLimit > 0 ? Math.max(0, Math.min(1, chatBudget / contextLimit)) : 0
+    const warning = chatBudget < Math.min(2048, contextLimit * 0.25)
 
     return (
-        <View
-            style={{
-                borderRadius: 8,
-                padding: 12,
-                marginHorizontal: 4,
-                rowGap: 8,
-                borderWidth: 2,
-                borderColor: color.primary._200,
+        <View style={{
+            borderRadius: 17, borderWidth: 1,
+            borderColor: warning ? '#88445C' : '#493653',
+            paddingHorizontal: 14, paddingVertical: 13,
+            backgroundColor: '#20192A', rowGap: 10,
+        }}>
+            <View style={{
+                flexDirection: 'row', alignItems: 'center',
+                justifyContent: 'space-between',
             }}>
-            <Text style={{ color: color.text._100 }}>
-                {t('contextlimit.allocation')}{' '}
-                <Text style={{ color: color.text._400 }}>({contextLimit})</Text>
-            </Text>
-            <Progress.Bar
-                progress={limit}
-                color={color.primary._400}
-                borderColor={color.neutral._300}
-                height={12}
-                unfilledColor={genLengthColor}
-                borderRadius={12}
-                width={null}
-            />
-            <View style={{ flexDirection: 'row', columnGap: 4, alignItems: 'center' }}>
-                {warning ? (
-                    <AntDesign
-                        name={'exclamation-circle'}
-                        size={16}
-                        style={{
-                            color: color.error._400,
-                        }}
-                    />
-                ) : (
-                    <MaterialIcons
-                        name="circle"
-                        size={16}
-                        style={{
-                            color: color.primary._400,
-                        }}
-                    />
-                )}
-                <Text style={{ color: color.text._400, textAlign: 'center' }}>
-                    {t('contextlimit.chat')}: {leftover}
+                <Text style={{
+                    color: '#98E8DE', fontSize: 10,
+                    letterSpacing: 1.6, fontWeight: '900',
+                }}>CONTEXT BUDGET</Text>
+                <Text style={{
+                    color: color.text._100, fontWeight: '900', fontSize: 14,
+                }}>{contextLimit.toLocaleString()}</Text>
+            </View>
+            <View style={{
+                height: 7, borderRadius: 7,
+                backgroundColor: '#5A2F6E', overflow: 'hidden',
+            }}>
+                <View style={{
+                    height: '100%', borderRadius: 7,
+                    width: (ratio * 100) + '%',
+                    backgroundColor: '#D552A3',
+                }} />
+            </View>
+            <View style={{
+                flexDirection: 'row', justifyContent: 'space-between',
+                alignItems: 'center',
+            }}>
+                <Text style={{ color: color.text._400, fontSize: 11 }}>
+                    CHAT   <Text style={{
+                        color: color.text._100, fontWeight: '800',
+                    }}>{chatBudget.toLocaleString()}</Text>
                 </Text>
-                <MaterialIcons
-                    name="circle"
-                    size={16}
-                    style={{
-                        color: genLengthColor,
-                        marginLeft: 12,
-                    }}
-                />
-                <Text style={{ color: color.text._400, textAlign: 'center' }}>
-                    {t('contextlimit.generated')}: {generatedLength}
+                <Text style={{ color: color.text._400, fontSize: 11 }}>
+                    REPLY   <Text style={{
+                        color: '#E59DCD', fontWeight: '800',
+                    }}>{generatedLength.toLocaleString()}</Text>
                 </Text>
             </View>
             {warning && (
-                <Text style={{ color: color.error._300 }}>{t('contextlimit.warning')}</Text>
+                <View style={{ flexDirection: 'row', gap: 7, alignItems: 'center' }}>
+                    <AntDesign name="exclamation-circle" color="#FFA6B8" size={12} />
+                    <Text style={{ color: '#FFA6B8', fontSize: 11 }}>
+                        Chat context is low. Reduce generated tokens.
+                    </Text>
+                </View>
             )}
         </View>
     )

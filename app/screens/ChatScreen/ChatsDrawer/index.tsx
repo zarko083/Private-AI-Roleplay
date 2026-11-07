@@ -79,10 +79,14 @@ const ChatsDrawer = () => {
 
     return (
         <Drawer.Body drawerID={Drawer.ID.CHATLIST} drawerStyle={styles.drawer} direction="right">
+            <Text style={{
+                color: '#98E8DE', fontSize: 9, fontWeight: '900',
+                letterSpacing: 2, marginTop: 11, marginBottom: 9,
+            }}>PARC / STORY ARCHIVE</Text>
             <View
-                style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
+                style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 9 }}>
                 <Text style={styles.drawerTitle}>
-                    {showSearchBar ? t('chat.drawer.search.title') : t('chat.drawer.title')}
+                    {showSearchBar ? 'Find a story' : 'Your chapters'}
                 </Text>
                 <ThemedButton
                     variant="tertiary"
@@ -107,7 +111,7 @@ const ChatsDrawer = () => {
             </Animated.View>
             {!showSearchResults && !showSearchBar && (
                 <Text style={{ color: color.text._500, fontSize: 12, lineHeight: 18, marginVertical: 8 }}>
-                    Tap to continue. Long press a story to rename, clone, export or delete it.
+                    Pick up a previous chapter. Hold a chapter to manage or export it.
                 </Text>
             )}
             {!showSearchResults && (
@@ -176,22 +180,25 @@ const useStyles = () => {
     return StyleSheet.create({
         drawer: {
             backgroundColor: color.neutral._100,
-            width: '90%',
+            width: '89%',
             shadowColor: color.shadow,
-            borderTopWidth: 3,
+            borderLeftWidth: 1,
+            borderLeftColor: '#754180',
             elevation: 20,
             right: 0,
             position: 'absolute',
             height: '100%',
-            paddingHorizontal: spacing.xl,
+            paddingHorizontal: 14,
             paddingTop: spacing.xl,
             paddingBottom: spacing.xl2,
         },
 
         drawerTitle: {
-            color: color.text._300,
-            fontSize: fontSize.xl,
-            paddingLeft: spacing.s,
+            color: color.text._100,
+            fontSize: 23,
+            fontWeight: '900',
+            letterSpacing: -0.6,
+            paddingLeft: 1,
         },
 
         title: {
