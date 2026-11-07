@@ -104,13 +104,13 @@ const CharacterList: React.FC = () => {
                     onStartReached={() => {
                         if (pages !== 3) setPages(3)
                     }}
-                    ListEmptyComponent={() => data.length === 0 && updatedAt && <CharactersEmpty />}
+                    ListEmptyComponent={() => data.length === 0 && updatedAt && (
+                        textFilter.trim() || tagFilter.length > 0
+                            ? <CharactersSearchEmpty />
+                            : <CharactersEmpty />
+                    )}
                 />
             </View>
-
-            {characterList.length === 0 && data.length !== 0 && updatedAt && (
-                <CharactersSearchEmpty />
-            )}
         </View>
     )
 }
