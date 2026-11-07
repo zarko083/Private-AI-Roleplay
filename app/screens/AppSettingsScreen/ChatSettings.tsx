@@ -48,7 +48,7 @@ const ChatSettings = () => {
                 label="Include Names"
                 value={includeNames ?? true}
                 onChangeValue={setIncludeNames}
-                description="Adds the Character Card and user persona names to the prompt. Keep enabled for most chats; disable for adventure or empty cards."
+                description="Keeps your character and persona names available to the AI without displaying them as a prefix before each reply."
             />
 
             <ThemedSwitch
