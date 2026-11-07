@@ -1,4 +1,4 @@
-// PARC mobile QA candidate: branded UI, Include Names, non-destructive Avatar Pan & Zoom.
+// PARC Studio v2 QA: editorial library, sectioned editor, chat dock, generation lab, local engine and control centre.
 const IS_DEV = process.env.APP_VARIANT === 'development'
 
 module.exports = {
