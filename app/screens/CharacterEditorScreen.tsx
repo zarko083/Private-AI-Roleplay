@@ -75,13 +75,18 @@ const ChracterEditorScreen = () => {
         setCharacterCard(card)
     }
 
-    const handleSaveCard = async () => {
-        if (characterCard && charId)
-            return Characters.db.mutate.updateCard(characterCard, charId).then(() => {
-                setCurrentCard(charId)
-                setEdited(() => false)
-                Logger.infoToast(t('character.editor.messages.saved'))
-            })
+    const handleSaveCard = async (): Promise<boolean> => {
+        if (!characterCard || !charId) return false
+        try {
+            await Characters.db.mutate.updateCard(characterCard, charId)
+            await setCurrentCard(charId)
+            setEdited(false)
+            Logger.infoToast(t('character.editor.messages.saved'))
+            return true
+        } catch (error) {
+            Logger.errorToast('Unable to save this character. Please try again.', error)
+            return false
+        }
     }
 
     usePreventRemove(edited, ({ data }) => {
@@ -94,8 +99,8 @@ const ChracterEditorScreen = () => {
                 {
                     label: t('common.actions.save'),
                     onPress: async () => {
-                        await handleSaveCard()
-                        navigation.dispatch(data.action)
+                        const saved = await handleSaveCard()
+                        if (saved) navigation.dispatch(data.action)
                     },
                 },
                 {
