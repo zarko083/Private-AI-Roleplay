@@ -1,241 +1,92 @@
 import { LinearGradient } from 'expo-linear-gradient'
-import { StyleSheet, Text, View } from 'react-native'
+import { Text, View } from 'react-native'
 
-type CharacterLibraryBannerProps = {
-    characterCount: number
-}
+type Props = { characterCount: number }
 
 /**
- * Offline-first PARC hero artwork.
- * Modern geometric / digital-audio visual, not fantasy scenery.
- * All art is rendered locally so the character library never needs Internet.
+ * PARC Studio: a compact library masthead rather than ChatterUI's gallery hero.
+ * No network assets or marketing-style illustrations.
  */
-const CharacterLibraryBanner: React.FC<CharacterLibraryBannerProps> = ({ characterCount }) => {
-    return (
-        <View style={styles.container}>
-            <LinearGradient
-                colors={['#2A1039', '#542177', '#8E1EA2']}
-                start={{ x: 0, y: 0.5 }}
-                end={{ x: 1, y: 0.5 }}
-                style={StyleSheet.absoluteFill}
-            />
-
-            {/* Abstract contemporary illustration: glass tiles, signal ring and glow. */}
-            <View pointerEvents="none" style={styles.artwork}>
-                <View style={styles.orbitOuter} />
-                <View style={styles.orbitInner} />
-                <LinearGradient
-                    colors={['#D552A3', '#8E1EA2', '#542177']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={styles.orb}
-                />
-                <View style={styles.orbHighlight} />
-                <View style={styles.glassPanel}>
-                    <View style={styles.signalBars}>
-                        <View style={[styles.signal, { height: 13 }]} />
-                        <View style={[styles.signal, { height: 24 }]} />
-                        <View style={[styles.signal, { height: 18 }]} />
-                        <View style={[styles.signal, { height: 31 }]} />
-                        <View style={[styles.signal, { height: 15 }]} />
-                    </View>
-                </View>
-                <View style={styles.mintDot} />
-                <View style={styles.pinkDot} />
-            </View>
-
-            <View style={styles.copy}>
-                <View style={styles.eyebrowRow}>
-                    <View style={styles.mintRule} />
-                    <Text style={styles.eyebrow}>PARC / YOUR SPACE</Text>
-                </View>
-                <Text style={styles.heading} numberOfLines={1}>Characters</Text>
-                <Text style={styles.subtitle} numberOfLines={2}>
-                    Your characters, your stories. Pick up where you left off.
+const CharacterLibraryBanner: React.FC<Props> = ({ characterCount }) => (
+    <View style={{
+        paddingHorizontal: 14,
+        paddingTop: 17,
+        paddingBottom: 16,
+        marginBottom: 12,
+        borderBottomWidth: 1,
+        borderColor: '#382846',
+    }}>
+        <View style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+        }}>
+            <View style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                columnGap: 8,
+            }}>
+                <LinearGradient colors={['#D552A3', '#8E1EA2']} style={{
+                    width: 30, height: 30, borderRadius: 10, alignItems: 'center',
+                    justifyContent: 'center',
+                }}>
+                    <Text style={{ color: '#FFFFFF', fontSize: 18, fontWeight: '900' }}>P</Text>
+                </LinearGradient>
+                <Text style={{ color: '#CDB3D9', fontSize: 11, letterSpacing: 2.2, fontWeight: '800' }}>
+                    PARC / STUDIO
                 </Text>
-                <View style={styles.countPill}>
-                    <View style={styles.pillDot} />
-                    <Text style={styles.pillText}>
-                        {characterCount} {characterCount === 1 ? 'Character' : 'Characters'}
-                    </Text>
-                </View>
+            </View>
+            <View style={{
+                flexDirection: 'row', gap: 6, alignItems: 'center',
+                borderWidth: 1, borderColor: '#2D4E4D',
+                backgroundColor: '#122A2C', paddingHorizontal: 10,
+                paddingVertical: 6, borderRadius: 8,
+            }}>
+                <View style={{ width: 5, height: 5, backgroundColor: '#98E8DE', borderRadius: 3 }} />
+                <Text style={{ color: '#98E8DE', fontSize: 9, letterSpacing: 1, fontWeight: '800' }}>
+                    PRIVATE
+                </Text>
             </View>
         </View>
-    )
-}
+
+        <View style={{
+            flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between',
+            marginTop: 17,
+        }}>
+            <View style={{ flex: 1 }}>
+                <Text style={{
+                    color: '#F8F3FA', fontSize: 32, letterSpacing: -1.4,
+                    fontWeight: '900', lineHeight: 37,
+                }}>
+                    Your stories.
+                </Text>
+                <Text style={{
+                    color: '#9D8BA8', fontSize: 12, lineHeight: 18,
+                    marginTop: 5,
+                }}>
+                    Choose a character. Continue the moment.
+                </Text>
+            </View>
+            <View style={{
+                alignItems: 'center', justifyContent: 'center',
+                minWidth: 64, height: 64,
+                borderRadius: 16, backgroundColor: '#2A1934',
+                borderWidth: 1, borderColor: '#60426D',
+            }}>
+                <Text style={{
+                    fontSize: 26, fontWeight: '900', lineHeight: 29, color: '#F8F3FA',
+                }}>
+                    {characterCount}
+                </Text>
+                <Text style={{
+                    color: '#BEA3CE', fontSize: 9, fontWeight: '800',
+                    letterSpacing: 1,
+                }}>
+                    CARDS
+                </Text>
+            </View>
+        </View>
+    </View>
+)
 
 export default CharacterLibraryBanner
-
-const styles = StyleSheet.create({
-    container: {
-        marginHorizontal: 8,
-        marginTop: 6,
-        marginBottom: 15,
-        minHeight: 174,
-        borderRadius: 22,
-        borderWidth: 1,
-        borderColor: 'rgba(213, 82, 163, 0.50)',
-        overflow: 'hidden',
-        backgroundColor: '#542177',
-    },
-    copy: {
-        width: '69%',
-        minHeight: 174,
-        paddingTop: 18,
-        paddingBottom: 16,
-        paddingHorizontal: 17,
-        justifyContent: 'center',
-        zIndex: 2,
-    },
-    eyebrowRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        columnGap: 6,
-    },
-    mintRule: {
-        width: 13,
-        height: 3,
-        borderRadius: 3,
-        backgroundColor: '#98E8DE',
-    },
-    eyebrow: {
-        color: '#EAC9FA',
-        fontWeight: '800',
-        fontSize: 9,
-        letterSpacing: 1.2,
-    },
-    heading: {
-        color: '#FFFFFF',
-        fontSize: 28,
-        letterSpacing: -0.8,
-        fontWeight: '800',
-        marginTop: 10,
-    },
-    subtitle: {
-        marginTop: 5,
-        maxWidth: 225,
-        color: '#E9D9ED',
-        fontSize: 11,
-        lineHeight: 16,
-    },
-    countPill: {
-        marginTop: 13,
-        alignSelf: 'flex-start',
-        flexDirection: 'row',
-        alignItems: 'center',
-        columnGap: 7,
-        backgroundColor: 'rgba(22, 9, 33, 0.58)',
-        borderWidth: 1,
-        borderColor: 'rgba(152, 232, 222, 0.42)',
-        borderRadius: 99,
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-    },
-    pillDot: {
-        width: 6,
-        height: 6,
-        borderRadius: 3,
-        backgroundColor: '#98E8DE',
-    },
-    pillText: {
-        fontSize: 11,
-        color: '#FFFFFF',
-        fontWeight: '700',
-    },
-    artwork: {
-        position: 'absolute',
-        right: -18,
-        top: -9,
-        width: 192,
-        height: 196,
-        justifyContent: 'center',
-        alignItems: 'center',
-        overflow: 'hidden',
-    },
-    orbitOuter: {
-        position: 'absolute',
-        width: 178,
-        height: 178,
-        borderWidth: 1,
-        borderColor: 'rgba(152, 232, 222, 0.36)',
-        borderRadius: 90,
-        right: -15,
-        top: 10,
-    },
-    orbitInner: {
-        position: 'absolute',
-        width: 130,
-        height: 130,
-        borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.30)',
-        borderRadius: 70,
-        right: 10,
-        top: 34,
-    },
-    orb: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
-        transform: [{ rotate: '-18deg' }],
-        shadowColor: '#D552A3',
-        shadowOpacity: 0.65,
-        shadowRadius: 24,
-        shadowOffset: { width: 0, height: 0 },
-        elevation: 7,
-        position: 'absolute',
-        right: 24,
-        top: 49,
-    },
-    orbHighlight: {
-        position: 'absolute',
-        right: 51,
-        top: 58,
-        width: 48,
-        height: 22,
-        borderRadius: 24,
-        backgroundColor: 'rgba(255, 255, 255, 0.22)',
-        transform: [{ rotate: '-26deg' }],
-    },
-    glassPanel: {
-        position: 'absolute',
-        right: 8,
-        bottom: 17,
-        width: 115,
-        height: 55,
-        borderRadius: 15,
-        backgroundColor: 'rgba(33, 12, 49, 0.66)',
-        borderColor: 'rgba(152, 232, 222, 0.46)',
-        borderWidth: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        transform: [{ rotate: '-12deg' }],
-    },
-    signalBars: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        columnGap: 7,
-    },
-    signal: {
-        width: 5,
-        borderRadius: 3,
-        backgroundColor: '#98E8DE',
-    },
-    mintDot: {
-        position: 'absolute',
-        right: 152,
-        top: 30,
-        height: 8,
-        width: 8,
-        borderRadius: 4,
-        backgroundColor: '#98E8DE',
-    },
-    pinkDot: {
-        position: 'absolute',
-        right: 11,
-        top: 35,
-        height: 11,
-        width: 11,
-        borderRadius: 6,
-        backgroundColor: '#D552A3',
-    },
-})

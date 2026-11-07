@@ -11,6 +11,7 @@ import HeaderTitle from '@components/views/HeaderTitle'
 import { Characters, CharInfo } from '@lib/state/Characters'
 import { CharacterSorter } from '@lib/state/CharacterSorter'
 import { TagHider } from '@lib/state/TagHider'
+import { Theme } from '@lib/theme/ThemeManager'
 
 import CharacterLibraryBanner from './CharacterLibraryBanner'
 import CharacterListHeader from './CharacterListHeader'
@@ -23,6 +24,7 @@ const PAGE_SIZE = 30
 
 const CharacterList: React.FC = () => {
     const [nowLoading, setNowLoading] = useState(false)
+    const { color } = Theme.useTheme()
     const { searchType, searchOrder, tagFilter, textFilter } = CharacterSorter.useSorterStore(
         useShallow((state) => ({
             searchType: state.searchType,
@@ -64,7 +66,7 @@ const CharacterList: React.FC = () => {
     if (path !== '/') return null
 
     return (
-        <View style={{ paddingTop: 16, paddingHorizontal: 8, flex: 1 }}>
+        <View style={{ paddingTop: 6, paddingHorizontal: 11, flex: 1, backgroundColor: color.neutral._100 }}>
             <HeaderTitle />
             <HeaderButton
                 headerLeft={() => <Drawer.Button drawerID={Drawer.ID.SETTINGS} />}
@@ -77,21 +79,18 @@ const CharacterList: React.FC = () => {
             <CharacterListHeader resultLength={characterList.length} />
             <View style={{ flex: 1 }}>
                 <Animated.FlatList
-                    key="private-grid-2"
-                    numColumns={2}
-                    columnWrapperStyle={{ justifyContent: 'space-between' }}
+                    key="parc-studio-list-v2"
+                    numColumns={1}
                     showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{ rowGap: 14, paddingHorizontal: 6, paddingBottom: 44 }}
+                    contentContainerStyle={{ paddingHorizontal: 5, paddingTop: 4, paddingBottom: 44 }}
                     data={characterList}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={({ item }) => (
-                        <View style={{ width: '48.5%' }}>
-                            <CharacterListing
-                                character={item}
-                                nowLoading={nowLoading}
-                                setNowLoading={setNowLoading}
-                            />
-                        </View>
+                        <CharacterListing
+                            character={item}
+                            nowLoading={nowLoading}
+                            setNowLoading={setNowLoading}
+                        />
                     )}
                     onEndReachedThreshold={1}
                     onEndReached={() => {

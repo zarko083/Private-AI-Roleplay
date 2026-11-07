@@ -66,8 +66,6 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
         }, [setShowSearch, setTextFilter, showSearch])
     )
 
-    if (resultLength === 0 && !showSearch) return null
-
     return (
         <>
             <View
@@ -75,20 +73,20 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                     flexDirection: 'row',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    paddingLeft: 10,
-                    paddingRight: 8,
-                    paddingBottom: 12,
+                    paddingLeft: 6,
+                    paddingRight: 5,
+                    paddingBottom: 13,
                 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', columnGap: 3 }}>
                     <Text
                         style={{
                             color: color.text._500,
-                            fontSize: 10,
-                            letterSpacing: 1,
+                            fontSize: 9,
+                            letterSpacing: 1.2,
                             fontWeight: '700',
                             marginRight: 4,
                         }}>
-                        SORT
+                        ORDER BY
                     </Text>
                     <SortButton type="modified" label={t('character.list.sort.recent')} />
                     <SortButton type="name" label={t('character.list.columns.name')} />

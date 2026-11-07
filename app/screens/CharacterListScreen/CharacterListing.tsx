@@ -1,6 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient'
-import { useTranslation } from 'react-i18next'
-import { StyleSheet, Text, View } from 'react-native'
+import { Text, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -13,24 +12,18 @@ import { Theme } from '@lib/theme/ThemeManager'
 import CharacterEditPopup from './CharacterEditPopup'
 import CharacterListingTags from './CharacterListingTags'
 
-type CharacterListingProps = {
+type Props = {
     character: CharInfo
     nowLoading: boolean
-    setNowLoading: (b: boolean) => void
+    setNowLoading: (value: boolean) => void
 }
 
 /**
- * PARC character tile.
- * The character image uses a true 1:1 square. Labels and the action sit
- * underneath the avatar so they never hide a face or crop over the portrait.
- * CharacterEditPopup continues to own tap and long-press actions.
+ * Editorial row layout with the 1:1 portrait preserved.
+ * The original CharacterEditPopup controls navigation and long-press actions.
  */
-const CharacterListing: React.FC<CharacterListingProps> = ({
-    character,
-    nowLoading,
-    setNowLoading,
-}) => {
-    const { t } = useTranslation()
+const CharacterListing: React.FC<Props> = ({ character, nowLoading, setNowLoading }) => {
+    const { color } = Theme.useTheme()
     const [showTags] = useMMKVBoolean(AppSettings.ShowTags)
     const { setShowSearch, setTagFilter, tagFilter } = CharacterSorter.useSorterStore(
         useShallow((state) => ({
@@ -39,44 +32,82 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
             tagFilter: state.tagFilter,
         }))
     )
-    const styles = useStyles()
     const hasChat = character.latestSwipe !== undefined && Boolean(character.latestName)
     const preview = hasChat
-        ? `${character.latestName}: ${character.latestSwipe?.trim() ?? ''}`
-        : t('character.list.emptyStates.noMessages')
+        ? character.latestSwipe?.trim() || 'Continue your story'
+        : 'A new story starts here.'
 
     return (
-        <View style={styles.root}>
+        <View style={{ marginBottom: 10 }}>
             <CharacterEditPopup
                 character={character}
-                setNowLoading={setNowLoading}
-                nowLoading={nowLoading}>
-                <View style={styles.card}>
-                    <View style={styles.avatarFrame}>
+                nowLoading={nowLoading}
+                setNowLoading={setNowLoading}>
+                <View style={{
+                    flexDirection: 'row',
+                    backgroundColor: color.neutral._200,
+                    borderRadius: 19, overflow: 'hidden',
+                    borderWidth: 1, borderColor: '#493452',
+                    minHeight: 135,
+                }}>
+                    <View style={{
+                        width: 128, minHeight: 135,
+                        overflow: 'hidden', backgroundColor: color.neutral._300,
+                    }}>
                         <Avatar
                             targetImage={Characters.getImageDir(character.image_id)}
-                            style={styles.squareAvatar}
+                            style={{ width: 128, height: 135 }}
                             contentFit="cover"
-                            accessibilityLabel={`${character.name} avatar`}
+                            accessibilityLabel={character.name + ' portrait'}
                         />
-                        <View style={styles.cornerAccent} pointerEvents="none" />
+                        <View pointerEvents="none" style={{
+                            height: 3, width: '100%', position: 'absolute',
+                            bottom: 0, backgroundColor: '#98E8DE',
+                        }} />
                     </View>
-                    <View style={styles.details}>
-                        <Text style={styles.name} numberOfLines={1}>
-                            {character.name}
-                        </Text>
-                        <Text style={styles.preview} numberOfLines={1}>
-                            {preview}
-                        </Text>
+                    <View style={{
+                        flex: 1, minWidth: 0,
+                        paddingHorizontal: 14, paddingVertical: 13,
+                        justifyContent: 'space-between',
+                    }}>
+                        <View>
+                            <Text style={{
+                                fontSize: 9, letterSpacing: 1.7,
+                                fontWeight: '800', color: '#98E8DE',
+                            }}>
+                                {hasChat ? 'CONTINUE STORY' : 'NEW STORY'}
+                            </Text>
+                            <Text numberOfLines={1} style={{
+                                color: color.text._100, fontSize: 19,
+                                letterSpacing: -0.4, fontWeight: '800',
+                                marginTop: 6,
+                            }}>
+                                {character.name}
+                            </Text>
+                            <Text numberOfLines={2} style={{
+                                marginTop: 4, lineHeight: 16,
+                                color: color.text._400, fontSize: 11,
+                            }}>
+                                {preview}
+                            </Text>
+                        </View>
                         <LinearGradient
-                            colors={['#D552A3', '#8E1EA2', '#542177']}
+                            colors={['#8E1EA2', '#D552A3']}
                             start={{ x: 0, y: 0.5 }}
                             end={{ x: 1, y: 0.5 }}
-                            style={styles.actionPill}>
-                            <Text style={styles.actionText} numberOfLines={1}>
-                                {hasChat ? 'CONTINUE' : 'START STORY'}
+                            style={{
+                                alignSelf: 'stretch', marginTop: 11,
+                                borderRadius: 10, flexDirection: 'row',
+                                minHeight: 32, paddingHorizontal: 12,
+                                alignItems: 'center', justifyContent: 'space-between',
+                            }}>
+                            <Text style={{
+                                fontSize: 10, color: '#FFFFFF',
+                                letterSpacing: 1.0, fontWeight: '900',
+                            }}>
+                                {hasChat ? 'RESUME' : 'START STORY'}
                             </Text>
-                            <Text style={styles.chevron}>›</Text>
+                            <Text style={{ fontSize: 16, color: '#FFFFFF' }}>›</Text>
                         </LinearGradient>
                     </View>
                 </View>
@@ -84,10 +115,9 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
             <CharacterListingTags
                 tags={character.tags}
                 showTags={Boolean(showTags)}
-                onPress={(tag: string) => {
+                onPress={(tag) => {
                     setShowSearch(true)
-                    if (tagFilter.includes(tag)) return
-                    setTagFilter([...tagFilter, tag])
+                    if (!tagFilter.includes(tag)) setTagFilter([...tagFilter, tag])
                 }}
             />
         </View>
@@ -95,82 +125,3 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
 }
 
 export default CharacterListing
-
-const useStyles = () => {
-    const { color } = Theme.useTheme()
-
-    return StyleSheet.create({
-        root: {
-            flex: 1,
-            minWidth: 0,
-        },
-        card: {
-            overflow: 'hidden',
-            borderRadius: 18,
-            borderWidth: 1,
-            borderColor: 'rgba(152, 232, 222, 0.22)',
-            backgroundColor: color.neutral._200,
-        },
-        avatarFrame: {
-            width: '100%',
-            aspectRatio: 1,
-            overflow: 'hidden',
-            backgroundColor: color.neutral._300,
-        },
-        squareAvatar: {
-            width: '100%',
-            height: '100%',
-        },
-        cornerAccent: {
-            position: 'absolute',
-            right: 0,
-            bottom: 0,
-            width: 28,
-            height: 3,
-            borderTopLeftRadius: 3,
-            backgroundColor: '#98E8DE',
-        },
-        details: {
-            paddingTop: 11,
-            paddingBottom: 12,
-            paddingHorizontal: 11,
-        },
-        name: {
-            color: color.text._100,
-            fontSize: 16,
-            fontWeight: '800',
-            letterSpacing: -0.3,
-        },
-        preview: {
-            marginTop: 4,
-            color: color.text._400,
-            fontSize: 11,
-            lineHeight: 16,
-            minHeight: 16,
-        },
-        actionPill: {
-            marginTop: 11,
-            borderRadius: 99,
-            paddingVertical: 9,
-            paddingHorizontal: 10,
-            minHeight: 35,
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            columnGap: 6,
-        },
-        actionText: {
-            color: '#FFFFFF',
-            fontSize: 11,
-            fontWeight: '800',
-            letterSpacing: 0.5,
-            flexShrink: 1,
-        },
-        chevron: {
-            color: '#98E8DE',
-            fontSize: 18,
-            fontWeight: '700',
-            lineHeight: 18,
-        },
-    })
-}
