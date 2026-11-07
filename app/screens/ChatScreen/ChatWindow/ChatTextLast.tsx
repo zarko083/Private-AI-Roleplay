@@ -7,15 +7,17 @@ import ThemedButton from '@components/buttons/ThemedButton'
 import AnimatedEllipsis from '@components/text/AnimatedEllipsis'
 import { ChatSwipe } from '@db/schema'
 import { useTextFilter } from '@lib/hooks/TextFilter'
+import { stripLeadingSpeakerPrefix } from '@lib/engine/API/NameContext'
 import { MarkdownStyle } from '@lib/markdown/Markdown'
 import { Chats, useInference } from '@lib/state/Chat'
 
 type ChatTextProps = {
     nowGenerating: boolean
     swipe: ChatSwipe
+    speakerName?: string
 }
 
-const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, swipe }) => {
+const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, swipe, speakerName }) => {
     const { t } = useTranslation()
     const { markdown, rules, style } = MarkdownStyle.useCustomFormatting()
 
@@ -61,6 +63,10 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, swipe }) => {
 
     const filteredText = useTextFilter(swipe.swipe ?? '')
     const renderedText = showHidden ? swipe.swipe : filteredText.result
+    const visibleText = stripLeadingSpeakerPrefix(
+        nowGenerating && swipe.id === currentSwipeId ? buffer.data.trim() : renderedText,
+        speakerName
+    )
 
     return (
         <Animated.View style={{ overflow: 'scroll', height: animHeight }}>
@@ -69,9 +75,7 @@ const ChatTextLast: React.FC<ChatTextProps> = ({ nowGenerating, swipe }) => {
                     <AnimatedEllipsis />
                 )}
                 <Markdown mergeStyle={false} markdownit={markdown} rules={rules} style={style}>
-                    {nowGenerating && swipe.id === currentSwipeId
-                        ? buffer.data.trim()
-                        : renderedText}
+                    {visibleText}
                 </Markdown>
                 {filteredText.found && (
                     <View style={{ flexDirection: 'row' }}>
