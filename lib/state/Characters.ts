@@ -533,6 +533,7 @@ export namespace Characters {
                             personality: card.personality,
                             scenario: card.scenario,
                             mes_example: card.mes_example,
+                            post_history_instructions: card.post_history_instructions,
                         })
                         .where(eq(characters.id, cardID))
                     await Promise.all(
