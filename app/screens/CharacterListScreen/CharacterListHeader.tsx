@@ -10,7 +10,7 @@ import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanim
 import { useShallow } from 'zustand/react/shallow'
 
 import ThemedButton from '@components/buttons/ThemedButton'
-import StringArrayEditor from '@components/input/StringArrayEditor'
+import ParcTagPicker from '@components/input/ParcTagPicker'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import { db } from '@db/db'
 import { characterTags, tags } from '@db/schema'
@@ -98,6 +98,7 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                         iconName="tag"
                         variant="tertiary"
                         onPress={() => {
+                            if (!showSearch) setShowSearch(true)
                             setShowTags(!showTags)
                             if (showTags && tagFilter.length > 0) setTagFilter([])
                         }}
@@ -128,18 +129,16 @@ const CharacterListHeader: React.FC<CharacterListHeaderProps> = ({ resultLength 
                         entering={FadeIn.delay(100)}
                         exiting={FadeOut}
                         style={{ paddingHorizontal: 12, paddingBottom: 10, rowGap: 8 }}>
-                        {showTags && data.length > 0 && (
-                            <StringArrayEditor
-                                containerStyle={{ flex: 0 }}
-                                suggestions={[...data]
-                                    .sort((a, b) => b.tagCount - a.tagCount)
-                                    .map((item) => item.tag)}
+                        {showTags && (
+                            <ParcTagPicker
                                 label={t('character.list.search.byTags')}
                                 value={tagFilter}
                                 setValue={setTagFilter}
-                                placeholder="Filter tags..."
+                                availableTags={[...data]
+                                    .filter((item) => item.tagCount > 0)
+                                    .sort((a, b) => b.tagCount - a.tagCount)
+                                    .map((item) => item.tag)}
                                 filterOnly
-                                showSuggestionsOnEmpty
                             />
                         )}
                         <ThemedTextInput
