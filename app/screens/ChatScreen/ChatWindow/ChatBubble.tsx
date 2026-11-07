@@ -53,16 +53,16 @@ const ChatBubble: React.FC<ChatTextProps> = ({
                     if (!nowGenerating) showEditor(entry.id)
                 }}
                 style={{
-                    backgroundColor: entry.is_user ? color.primary._100 : color.neutral._200,
-                    borderColor: entry.is_user ? color.primary._400 : color.neutral._400,
+                    backgroundColor: entry.is_user ? '#2A1B35' : '#191522',
+                    borderColor: entry.is_user ? '#69366E' : '#352943',
                     borderWidth: 1,
-                    marginBottom: showSwipe ? 1 : 5,
-                    paddingVertical: spacing.m,
+                    borderLeftWidth: entry.is_user ? 1 : 3,
+                    borderLeftColor: entry.is_user ? '#69366E' : '#98E8DE',
+                    marginBottom: showSwipe ? 2 : 6,
+                    paddingVertical: spacing.l,
                     paddingHorizontal: spacing.l,
-                    minHeight: 44,
-                    borderRadius: 18,
-                    borderTopRightRadius: entry.is_user ? 5 : 18,
-                    borderTopLeftRadius: entry.is_user ? 18 : 5,
+                    minHeight: 48,
+                    borderRadius: 9,
                 }}>
                 {isLastMessage ? (
                     <ChatTextLast nowGenerating={nowGenerating} swipe={swipe} />

@@ -156,15 +156,16 @@ const ChatInput = () => {
             disabled={activeProvider}
             style={{
                 position: 'absolute',
-                width: '96%',
+                width: '100%',
                 alignSelf: 'center',
-                bottom: 6,
-                padding: 8,
-                backgroundColor: color.neutral._200,
-                borderWidth: 1,
-                borderColor: color.primary._200,
-                borderRadius: 18,
-                rowGap: 6,
+                bottom: 0,
+                paddingHorizontal: 12,
+                paddingTop: 11,
+                paddingBottom: 9,
+                backgroundColor: '#18121F',
+                borderTopWidth: 1,
+                borderColor: '#66406D',
+                rowGap: 9,
             }}>
             <Text
                 style={{
@@ -177,7 +178,7 @@ const ChatInput = () => {
                 {nowGenerating
                     ? `GENERATING · ${generationSeconds}s · STOP TO END`
                     : activeProvider
-                      ? 'MESSAGE'
+                      ? 'PARC / COMPOSE'
                       : 'LOAD A MODEL TO CHAT'}
             </Text>
 
@@ -265,15 +266,15 @@ const ChatInput = () => {
                     ref={inputRef}
                     style={{
                         color: color.text._100,
-                        backgroundColor: color.neutral._100,
+                        backgroundColor: '#241A2E',
                         flex: 1,
-                        minHeight: 42,
+                        minHeight: 46,
                         maxHeight: 150,
                         borderWidth: 1,
-                        borderColor: activeProvider ? color.primary._600 : color.neutral._400,
-                        borderRadius: 16,
-                        paddingHorizontal: 12,
-                        paddingVertical: 9,
+                        borderColor: activeProvider ? '#694272' : color.neutral._400,
+                        borderRadius: 12,
+                        paddingHorizontal: 13,
+                        paddingVertical: 10,
                         fontSize: 14,
                     }}
                     numberOfLines={8}
@@ -297,16 +298,16 @@ const ChatInput = () => {
                     accessibilityLabel={nowGenerating ? 'Stop generation' : 'Send message'}
                     disabled={disableSend || !chatId || !activeProvider}
                     style={{
-                        width: 43,
-                        height: 43,
-                        borderRadius: 15,
+                        width: 45,
+                        height: 45,
+                        borderRadius: 12,
                         alignItems: 'center',
                         justifyContent: 'center',
                         backgroundColor: !activeProvider
                             ? color.neutral._300
                             : nowGenerating
                               ? color.error._500
-                              : color.primary._700,
+                              : '#D552A3',
                     }}
                     onPress={nowGenerating ? abortResponse : handleSend}>
                     <MaterialIcons

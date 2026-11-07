@@ -50,9 +50,9 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, i
             onPress={() => setShowViewer(true, entry.is_user)}>
             <Avatar
                 style={{
-                    width: wide ? 42 : 36,
-                    height: wide ? 42 : 36,
-                    borderRadius: 13,
+                    width: wide ? 40 : 32,
+                    height: wide ? 40 : 32,
+                    borderRadius: 9,
                 }}
                 targetImage={Characters.getImageDir(
                     entry.is_user ? userImageId : charImageId
@@ -70,11 +70,11 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, i
                 flexWrap: 'wrap',
                 columnGap: 10,
                 rowGap: 2,
-                marginBottom: 8,
+                marginBottom: 6,
             }}>
             <Text
                 numberOfLines={1}
-                style={{ fontSize: fontSize.m, fontWeight: '700', color: color.text._100 }}>
+                style={{ fontSize: fontSize.m, fontWeight: '700', color: entry.is_user ? '#E9A9D8' : '#98E8DE' }}>
                 {entry.name}
             </Text>
             <Text style={{ fontSize: fontSize.s, color: color.text._500 }}>
@@ -122,8 +122,8 @@ const ChatFrame: React.FC<ChatFrameProps> = ({ children, index, nowGenerating, i
             style={{
                 flexDirection: direction,
                 alignItems: 'flex-start',
-                marginHorizontal: 10,
-                marginVertical: 5,
+                marginHorizontal: 14,
+                marginVertical: 7,
                 columnGap: 10,
             }}>
             {avatar}

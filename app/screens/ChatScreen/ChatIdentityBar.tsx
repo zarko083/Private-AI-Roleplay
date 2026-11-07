@@ -1,3 +1,4 @@
+import AntDesign from '@react-native-vector-icons/ant-design/static'
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
 import { Pressable, Text, View } from 'react-native'
@@ -10,115 +11,97 @@ import { Theme } from '@lib/theme/ThemeManager'
 
 import StoryMemorySheet from './StoryMemorySheet'
 
-/** PARC identity header. The original local inference engine remains unchanged. */
+/**
+ * PARC Studio chapter header, distinct from the upstream ChatterUI toolbar.
+ * Uses original model routing and Story Memory sheet.
+ */
 const ChatIdentityBar = () => {
     const { color } = Theme.useTheme()
     const router = useRouter()
     const [memoryOpen, setMemoryOpen] = useState(false)
     const { available, mode } = useActiveProvider()
     const card = Characters.useCharacterStore((state) => state.card)
-    const localModelName = Llama.useLlamaModelStore((state) => state.model?.name)
-
-    const status = !available
-        ? mode === 'local'
-            ? 'LOAD MODEL'
-            : 'CONNECT API'
-        : mode === 'local'
-          ? 'LOCAL READY'
-          : 'API READY'
+    const modelName = Llama.useLlamaModelStore((state) => state.model?.name)
+    const status = !available ? 'NOT CONNECTED' : mode === 'local' ? 'ON DEVICE' : 'API CONNECTED'
 
     return (
         <>
-        <View
-            style={{
-                marginHorizontal: 14,
-                marginTop: 2,
-                marginBottom: 8,
-                paddingHorizontal: 12,
-                paddingVertical: 9,
-                borderRadius: 18,
-                borderWidth: 1,
-                borderColor: color.primary._200,
-                backgroundColor: color.neutral._200,
-                flexDirection: 'row',
-                alignItems: 'center',
-                columnGap: 8,
+            <View style={{
+                flexDirection: 'row', alignItems: 'center', columnGap: 11,
+                paddingHorizontal: 17, paddingTop: 13, paddingBottom: 14,
+                borderBottomWidth: 1, borderBottomColor: '#493451',
+                backgroundColor: color.neutral._100,
             }}>
-            <Avatar
-                targetImage={Characters.getImageDir(card?.image_id ?? 0)}
-                style={{ width: 43, height: 43, borderRadius: 14 }}
-                contentFit="cover"
-            />
-            <View style={{ flex: 1, minWidth: 0, justifyContent: 'center' }}>
-                <Text
-                    numberOfLines={1}
-                    style={{ fontSize: 16, fontWeight: '700', color: color.text._100 }}>
-                    {card?.name || 'Your story'}
-                </Text>
-                <Text
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                    accessibilityLabel={mode === 'local' && localModelName ? localModelName : 'Private conversation'}
-                    style={{
-                        fontSize: 10,
-                        marginTop: 3,
-                        letterSpacing: 0.3,
-                        fontWeight: '700',
-                        color: color.text._500,
+                <View style={{
+                    width: 54, height: 54, borderRadius: 15,
+                    borderWidth: 1.5, borderColor: '#D552A3', overflow: 'hidden',
+                }}>
+                    <Avatar
+                        targetImage={Characters.getImageDir(card?.image_id ?? 0)}
+                        style={{ width: '100%', height: '100%' }}
+                        contentFit="cover"
+                    />
+                </View>
+                <View style={{ flex: 1, minWidth: 0, justifyContent: 'center' }}>
+                    <Text style={{
+                        color: '#98E8DE', fontSize: 9,
+                        letterSpacing: 1.8, fontWeight: '900',
                     }}>
-                    {mode === 'local' && localModelName ? localModelName : 'PRIVATE CONVERSATION'}
-                </Text>
+                        PARC / LIVE STORY
+                    </Text>
+                    <Text numberOfLines={1} style={{
+                        color: color.text._100, fontSize: 19, fontWeight: '800',
+                        letterSpacing: -0.4, marginTop: 4,
+                    }}>
+                        {card?.name || 'Your story'}
+                    </Text>
+                    <Text numberOfLines={1} style={{
+                        color: color.text._500, fontSize: 10, marginTop: 3,
+                    }}>
+                        {mode === 'local' && modelName ? modelName : 'PRIVATE CONVERSATION'}
+                    </Text>
+                </View>
+                <View style={{ gap: 7, alignItems: 'flex-end' }}>
+                    <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel="Story Memory"
+                        onPress={() => setMemoryOpen(true)}
+                        style={{
+                            minWidth: 75, alignItems: 'center', justifyContent: 'center',
+                            paddingVertical: 9, borderRadius: 11,
+                            backgroundColor: '#412450', borderWidth: 1, borderColor: '#724383',
+                        }}>
+                        <Text style={{ color: '#F0C4E1', fontSize: 10, fontWeight: '900' }}>
+                            MEMORY
+                        </Text>
+                    </Pressable>
+                    <Pressable
+                        accessibilityRole="button"
+                        accessibilityLabel={'Model status: ' + status}
+                        onPress={() => router.push(
+                            mode === 'local'
+                                ? '/screens/ModelManagerScreen'
+                                : '/screens/ConnectionsManagerScreen'
+                        )}
+                        style={{
+                            flexDirection: 'row', gap: 5,
+                            alignItems: 'center', paddingVertical: 4,
+                        }}>
+                        <AntDesign
+                            name={available ? 'check-circle' : 'exclamation-circle'}
+                            size={11}
+                            color={available ? '#98E8DE' : '#D552A3'}
+                        />
+                        <Text style={{
+                            color: available ? '#98E8DE' : '#DDA8CE',
+                            fontSize: 9, fontWeight: '800',
+                        }}>
+                            {status}
+                        </Text>
+                    </Pressable>
+                </View>
             </View>
-            <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={status}
-                onPress={() =>
-                    router.push(
-                        mode === 'local'
-                            ? '/screens/ModelManagerScreen'
-                            : '/screens/ConnectionsManagerScreen'
-                    )
-                }
-                style={{
-                    flexShrink: 0,
-                    borderRadius: 20,
-                    borderWidth: 1,
-                    borderColor: available ? color.primary._400 : color.neutral._400,
-                    backgroundColor: available ? color.primary._100 : color.neutral._300,
-                    paddingHorizontal: 8,
-                    paddingVertical: 8,
-                }}>
-                <Text
-                    numberOfLines={2}
-                    style={{
-                        maxWidth: 70,
-                        textAlign: 'center',
-                        fontWeight: '700',
-                        fontSize: 9,
-                        lineHeight: 12,
-                        color: available ? '#98E8DE' : color.text._400,
-                    }}>
-                    {status}
-                </Text>
-            </Pressable>
-            <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="Open Story Memory"
-                onPress={() => setMemoryOpen(true)}
-                style={{
-                    borderRadius: 16,
-                    borderWidth: 1,
-                    borderColor: color.primary._400,
-                    paddingVertical: 9,
-                    paddingHorizontal: 7,
-                    backgroundColor: color.neutral._300,
-                }}>
-                <Text style={{ color: color.primary._800, fontSize: 10, fontWeight: '800' }}>
-                    MEMORY
-                </Text>
-            </Pressable>
-        </View>
-        <StoryMemorySheet visible={memoryOpen} onClose={() => setMemoryOpen(false)} />
+            <StoryMemorySheet visible={memoryOpen} onClose={() => setMemoryOpen(false)} />
         </>
     )
 }
