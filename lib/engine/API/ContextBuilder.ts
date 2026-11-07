@@ -15,7 +15,7 @@ import { Macro } from '@lib/utils/Macros'
 
 import { APIConfiguration, APIValues } from './APIBuilder.types'
 import { formatPinnedMemoryPrompt } from './PinnedMemory'
-import { formatNameAddressingRule } from './NameAddressing'
+import { formatIncludedNamesBlock, formatSpeakerPrefix } from './NameContext'
 import type { DataSource, DataSourceResult } from '../DataSources/types'
 
 export type MessageLoader = {
@@ -118,13 +118,15 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
         useSuffix,
     })
 
-    // Optional PARC user-name preference applies to both on-device GGUF and remote API engines.
-    // It uses the User Card bound to this conversation, not an unrelated global profile.
-    if (mmkv.getBoolean(AppSettings.AddressUserByName)) {
-        const addressRule = formatNameAddressingRule(user?.name)
-        if (addressRule) {
-            systemPrompt += '\n' + addressRule
-            systemPromptLength += await tokenizer(addressRule)
+    // Include the active Character Card and User Persona names in the prompt, without
+    // forcing the character to call the user by name in every answer.
+    // An explicit OFF overrides any legacy instruct.names setting.
+    const includeNames = mmkv.getBoolean(AppSettings.IncludeNames) ?? true
+    if (includeNames) {
+        const namesBlock = formatIncludedNamesBlock(character?.name, user?.name)
+        if (namesBlock) {
+            systemPrompt += '\n' + namesBlock
+            systemPromptLength += await tokenizer(namesBlock)
         }
     }
 
@@ -156,10 +158,11 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
             ? `[${swipe.send_date.toDateString()} ${swipe.send_date.toLocaleTimeString()}]\n`
             : ''
 
-        const name = instruct.names ? `${message.name}: ` : ''
+        const speakerName = message.is_user ? user?.name : character?.name
+        const name = includeNames ? formatSpeakerPrefix(speakerName || message.name) : ''
 
         const timestampLen = instruct.timestamp ? await tokenizer(timestamp) : 0
-        const nameLen = instruct.names ? await tokenizer(name) : 0
+        const nameLen = name ? await tokenizer(name) : 0
 
         let instructLen = 0
         if (mode === 'text') {
