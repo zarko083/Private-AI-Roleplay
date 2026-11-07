@@ -39,7 +39,7 @@ const ModelManagerScreen = () => {
         <SafeAreaView
             edges={['bottom']}
             style={{ paddingTop: spacing.l, paddingHorizontal: spacing.xl, paddingBottom: spacing.xl, flex: 1, backgroundColor: color.neutral._100 }}>
-            <HeaderTitle title={showSettings ? 'Model Settings' : 'PARC Local Models'} />
+            <HeaderTitle title={showSettings ? 'Engine Settings' : 'PARC Engine'} />
             <HeaderButton
                 headerRight={() =>
                     !showSettings && (
@@ -57,11 +57,11 @@ const ModelManagerScreen = () => {
                         modelUpdatedAt={modelUpdatedAt}
                     />
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 4, marginTop: 4, marginBottom: 4 }}>
-                        <Text style={{ color: color.text._100, fontSize: 14, fontWeight: '700' }}>On-device library</Text>
-                        <Text style={{ color: color.text._500, fontSize: 11 }}>{modelList?.length ?? 0} models</Text>
+                        <Text style={{ color: color.text._100, fontSize: 15, fontWeight: '800' }}>Your models</Text>
+                        <Text style={{ color: color.text._500, fontSize: 11, color: '#98E8DE' }}>{modelList?.length ?? 0} models</Text>
                     </View>
                     <SectionList
-                        style={{ flex: 1, marginTop: 8 }}
+                        style={{ flex: 1, marginTop: 5 }}
                         sections={data}
                         renderItem={({ item }) => (
                             <ModelItem

@@ -131,8 +131,26 @@ const ModelItem: React.FC<ModelItemProps> = ({
                 defaultValue={item.name}
             />
             <View style={{ flex: 1, alignContent: 'center' }}>
-                <TouchableOpacity onPress={() => setShowInfo(!showInfo)}>
-                    <Text style={styles.title}>{item.name}</Text>
+                <TouchableOpacity
+                    onPress={() => setShowInfo(!showInfo)}
+                    accessibilityRole="button"
+                    accessibilityLabel={'Show details for ' + item.name}>
+                    <View style={{ flexDirection: 'row', gap: 7, alignItems: 'center' }}>
+                        <Text style={styles.title} numberOfLines={2}>{item.name}</Text>
+                        {isLoaded && (
+                            <View style={{
+                                backgroundColor: '#1E3938', borderRadius: 7,
+                                paddingHorizontal: 7, paddingVertical: 4,
+                            }}>
+                                <Text style={{ color: '#98E8DE', fontSize: 9, fontWeight: '900' }}>
+                                    ACTIVE
+                                </Text>
+                            </View>
+                        )}
+                    </View>
+                    <Text style={{
+                        color: color.text._500, fontSize: 10, marginTop: 5,
+                    }}>{showInfo ? 'LESS DETAILS  ↑' : 'DETAILS  ↓'}</Text>
                 </TouchableOpacity>
                 {showInfo && !isInvalid && (
                     <>
@@ -246,7 +264,10 @@ const ModelItem: React.FC<ModelItemProps> = ({
 
                 {!isMMPROJ && (
                     <TouchableOpacity
+                        style={styles.loadButton}
                         disabled={loadToggle}
+                        accessibilityRole="button"
+                        accessibilityLabel={isLoaded ? 'Unload model' : 'Load model'}
                         onPress={async () => {
                             if (isLoaded) {
                                 await unloadModel()
@@ -291,16 +312,26 @@ const useStyles = () => {
 
     return StyleSheet.create({
         modelContainer: {
-            borderRadius: spacing.l,
-            paddingVertical: spacing.l,
-            paddingHorizontal: spacing.xl2,
-            backgroundColor: color.neutral._200,
-            minHeight: 64,
+            borderRadius: 16,
+            paddingVertical: 15,
+            paddingHorizontal: 14,
+            backgroundColor: '#211A2A',
+            borderWidth: 1,
+            borderColor: '#49344E',
+            minHeight: 86,
             columnGap: 12,
             alignItems: 'center',
-            marginBottom: spacing.l,
+            marginBottom: 9,
             flexDirection: 'row',
             justifyContent: 'space-between',
+        },
+        loadButton: {
+            width: 40,
+            height: 40,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 12,
+            backgroundColor: '#35243F',
         },
 
         tagContainer: {
@@ -323,7 +354,9 @@ const useStyles = () => {
             textTransform: 'capitalize',
         },
         title: {
-            fontSize: fontSize.l,
+            fontSize: 14,
+            fontWeight: '800',
+            flexShrink: 1,
             color: color.text._100,
         },
 
@@ -334,7 +367,7 @@ const useStyles = () => {
         buttonContainer: {
             flexDirection: 'row',
             alignItems: 'center',
-            columnGap: spacing.xl2,
+            columnGap: 11,
         },
     })
 }
