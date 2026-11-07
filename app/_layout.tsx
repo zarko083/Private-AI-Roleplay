@@ -30,7 +30,7 @@ const Layout = () => {
                         headerStyle: { backgroundColor: color.neutral._100 },
                         headerTitleStyle: {
                             color: color.text._100, fontWeight: '800',
-                            fontSize: 17, letterSpacing: -0.3,
+                            fontSize: 17,
                         },
                         headerTintColor: '#E9ABD9',
                         contentStyle: { backgroundColor: color.neutral._100 },
