@@ -17,6 +17,7 @@ import CharacterLibraryBanner from './CharacterLibraryBanner'
 import CharacterListHeader from './CharacterListHeader'
 import CharacterListing from './CharacterListing'
 import CharacterNewMenu from './CharacterNewMenu'
+import ParcLibraryDock from './ParcLibraryDock'
 import CharactersEmpty from './CharactersEmpty'
 import CharactersSearchEmpty from './CharactersSearchEmpty'
 
@@ -110,6 +111,7 @@ const CharacterList: React.FC = () => {
                     )}
                 />
             </View>
+            <ParcLibraryDock />
         </View>
     )
 }
