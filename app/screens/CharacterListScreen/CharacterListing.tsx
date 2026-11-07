@@ -48,15 +48,16 @@ const CharacterListing: React.FC<Props> = ({ character, nowLoading, setNowLoadin
                     backgroundColor: color.neutral._200,
                     borderRadius: 19, overflow: 'hidden',
                     borderWidth: 1, borderColor: '#493452',
-                    minHeight: 135,
+                    minHeight: 142,
                 }}>
                     <View style={{
-                        width: 128, minHeight: 135,
+                        width: 120, height: 120, margin: 10,
+                        alignSelf: 'center', borderRadius: 12,
                         overflow: 'hidden', backgroundColor: color.neutral._300,
                     }}>
                         <Avatar
                             targetImage={Characters.getImageDir(character.image_id)}
-                            style={{ width: 128, height: 135 }}
+                            style={{ width: 120, height: 120 }}
                             contentFit="cover"
                             accessibilityLabel={character.name + ' portrait'}
                         />

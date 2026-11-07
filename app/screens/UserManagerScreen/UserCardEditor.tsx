@@ -147,6 +147,29 @@ const UserCardEditor = () => {
                 onCancel={() => setAvatarEdit(null)}
                 onSave={saveAvatarPlacement}
             />
+            <View style={{
+                paddingHorizontal: 13, paddingTop: 14, paddingBottom: 12,
+                borderBottomWidth: 1, borderColor: '#483650',
+            }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <View style={{
+                        width: 15, height: 3, backgroundColor: '#98E8DE',
+                        borderRadius: 2,
+                    }} />
+                    <Text style={{
+                        color: '#98E8DE', fontSize: 10,
+                        fontWeight: '900', letterSpacing: 1.8,
+                    }}>PARC / USER PERSONA</Text>
+                </View>
+                <Text style={{
+                    color: color.text._100, fontSize: 22, marginTop: 9,
+                    fontWeight: '800', letterSpacing: -0.5,
+                }}>Who are you in this story?</Text>
+                <Text style={{
+                    color: color.text._400, fontSize: 12,
+                    lineHeight: 18, marginTop: 5,
+                }}>Your name and description guide character interactions.</Text>
+            </View>
             <View style={styles.nameBar}>
                 <ContextMenu
                     placement="right"
@@ -259,22 +282,25 @@ const useStyles = () => {
             paddingHorizontal: spacing.m,
             paddingTop: spacing.m,
             paddingBottom: spacing.s,
-            rowGap: 12,
+            rowGap: 15,
+            backgroundColor: color.neutral._100,
         },
 
         nameBar: {
             alignContent: 'flex-start',
-            borderRadius: borderRadius.xl,
+            borderRadius: 18,
             flexDirection: 'row',
             alignItems: 'center',
-            backgroundColor: color.neutral._100,
-            paddingVertical: 12,
+            backgroundColor: '#211A2A',
+            borderWidth: 1,
+            borderColor: '#4F3659',
+            paddingVertical: 15,
             paddingHorizontal: 12,
         },
 
         userImage: {
-            width: 84,
-            height: 84,
+            width: 105,
+            height: 105,
             borderRadius: borderRadius.xl2,
             borderColor: color.primary._500,
             borderWidth: borderWidth.m,

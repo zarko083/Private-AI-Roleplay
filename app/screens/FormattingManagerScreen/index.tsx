@@ -261,6 +261,24 @@ const FormattingManager = () => {
                 flex: 1,
             }}>
             <HeaderTitle title={t('formatting.title')} />
+            <View style={{
+                marginHorizontal: spacing.xl, marginTop: 8,
+                marginBottom: 15, paddingBottom: 15,
+                borderBottomWidth: 1, borderColor: color.neutral._400,
+            }}>
+                <Text style={{
+                    color: '#98E8DE', fontSize: 10,
+                    letterSpacing: 2, fontWeight: '900',
+                }}>PARC / PROMPT LAB</Text>
+                <Text style={{
+                    color: color.text._100, fontSize: 24,
+                    fontWeight: '900', letterSpacing: -0.8, marginTop: 7,
+                }}>Character voice & format</Text>
+                <Text style={{
+                    color: color.text._400, fontSize: 12,
+                    lineHeight: 18, marginTop: 5,
+                }}>Customise how the model reads cards and responds.</Text>
+            </View>
             <HeaderButton headerRight={headerRight} />
             <InputSheet
                 title={t('formatting.newPreset')}
