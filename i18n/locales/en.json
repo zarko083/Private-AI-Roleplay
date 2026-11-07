@@ -13,7 +13,7 @@
         "reportIssue": "Got an issue? Report it here:",
         "support": {
             "button": "Support ChatterUI",
-            "label": "Donate to ChatterUI here:"
+            "label": "Donate to PARC here:"
         },
         "versionPrefix": "v"
     },
@@ -341,7 +341,7 @@
             }
         },
         "brand": {
-            "name": "ChatterUI"
+            "name": "PARC"
         },
         "emptyStates": {
             "noItems": "No Items"
@@ -593,7 +593,7 @@
             "title": "Hidden Text"
         },
         "localtemplate": {
-            "description": "When in Local Mode, ChatterUI automatically uses the instruct template provided by the loaded model. Disable this if you want messages to be formatted using Instruct instead. System Prompt however is always used.",
+            "description": "When in Local Mode, PARC automatically uses the instruct template provided by the loaded model. Disable this if you want messages to be formatted using Instruct instead. System Prompt however is always used.",
             "label": "Use Built-In Local Model Template",
             "title": "Local Template"
         },
@@ -678,7 +678,7 @@
         "backenddev": "Backend Device",
         "batch": "Batch",
         "contextshift": "Context Shift",
-        "copymodel": "Copy Model Into ChatterUI",
+        "copymodel": "Copy Model Into PARC",
         "empty": "No Models Found. Try Importing Some!",
         "externalmodel": "Use External Model",
         "gpulayers": "GPU Layers",
@@ -793,8 +793,8 @@
             "title": "Character Management"
         },
         "chat": {
-            "askInChatterUI": "Ask in ChatterUI",
-            "askInChatterUIDescription": "Use ChatterUI prompts for text intent instead of the default keyboard behavior.",
+            "askInChatterUI": "Ask in PARC",
+            "askInChatterUIDescription": "Use PARC prompts for text intent instead of the default keyboard behavior.",
             "autoGenerateTitles": "Auto-generate chat titles",
             "autoGenerateTitlesDescription": "Create titles for new chats automatically.",
             "autoLoadUser": "Auto-load selected user",
