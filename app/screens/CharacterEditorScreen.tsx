@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { useShallow } from 'zustand/react/shallow'
 
 import ThemedButton from '@components/buttons/ThemedButton'
-import StringArrayEditor from '@components/input/StringArrayEditor'
+import ParcTagPicker from '@components/input/ParcTagPicker'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import Alert from '@components/views/Alert'
 import Avatar from '@components/views/Avatar'
@@ -561,7 +561,7 @@ const ChracterEditorScreen = () => {
                             numberOfLines={16}
                         />
 
-                        <StringArrayEditor
+                        <ParcTagPicker
                             label={t('character.editor.fields.tags')}
                             containerStyle={styles.input}
                             suggestions={data.data
