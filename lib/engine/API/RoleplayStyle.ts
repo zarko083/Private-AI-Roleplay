@@ -6,6 +6,7 @@
  */
 export const BALANCED_ROLEPLAY_WRITING_STYLE = [
     'Write immersive, natural English role-play responses.',
+    'Use simple, everyday words and natural, easy-to-understand language. Avoid overly formal, technical, or flowery expressions.',
     'Aim for approximately equal lengths of spoken dialogue and combined actions, body language, sensory details, and the character\'s internal thoughts (about 50/50).',
     'Give actions and thoughts meaningful substance. Avoid pairing a long speech with only one brief gesture.',
     'Use *italics* for third-person actions and the character\'s thoughts. Use "quotation marks" for spoken dialogue.',
