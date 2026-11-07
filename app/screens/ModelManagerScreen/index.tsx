@@ -58,7 +58,7 @@ const ModelManagerScreen = () => {
                     />
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 4, marginTop: 4, marginBottom: 4 }}>
                         <Text style={{ color: color.text._100, fontSize: 15, fontWeight: '800' }}>Your models</Text>
-                        <Text style={{ color: color.text._500, fontSize: 11, color: '#98E8DE' }}>{modelList?.length ?? 0} models</Text>
+                        <Text style={{ color: '#98E8DE', fontSize: 11 }}>{modelList?.length ?? 0} models</Text>
                     </View>
                     <SectionList
                         style={{ flex: 1, marginTop: 5 }}
