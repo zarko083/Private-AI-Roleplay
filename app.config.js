@@ -7,8 +7,8 @@ module.exports = {
         slug: 'ChatterUI',
         version: '0.10.1',
         orientation: 'default',
-        icon: './assets/images/icon.png',
-        scheme: 'chatterui',
+        icon: './assets/images/parc-icon.png',
+        scheme: 'parc',
         userInterfaceStyle: 'automatic',
         assetBundlePatterns: ['**/*'],
         ios: {
@@ -23,10 +23,10 @@ module.exports = {
         },
         android: {
             adaptiveIcon: {
-                foregroundImage: './assets/images/adaptive-icon-foreground.png',
-                backgroundImage: './assets/images//adaptive-icon-background.png',
-                monochromeImage: './assets/images/adaptive-icon-foreground.png',
-                backgroundColor: '#000',
+                foregroundImage: './assets/images/parc-adaptive-foreground.png',
+                backgroundColor: '#F8F4FA',
+                monochromeImage: './assets/images/parc-adaptive-foreground.png',
+                // Kept the original Android package ID for in-place updates.
             },
             package: IS_DEV ? 'com.Vali98.ChatterUIDev' : 'com.Vali98.ChatterUI',
             userInterfaceStyle: 'dark',
@@ -39,7 +39,7 @@ module.exports = {
         web: {
             bundler: 'metro',
             output: 'static',
-            favicon: './assets/images/adaptive-icon.png',
+            favicon: './assets/images/parc-icon.png',
         },
         plugins: [
             [
@@ -64,15 +64,15 @@ module.exports = {
             [
                 'expo-splash-screen',
                 {
-                    backgroundColor: '#000000',
-                    image: './assets/images/adaptive-icon.png',
-                    imageWidth: 200,
+                    backgroundColor: '#100D17',
+                    image: './assets/images/parc-splash.png',
+                    imageWidth: 260,
                 },
             ],
             [
                 'expo-notifications',
                 {
-                    icon: './assets/images/notification.png',
+                    icon: './assets/images/parc-adaptive-foreground.png',
                 },
             ],
             [
@@ -81,18 +81,18 @@ module.exports = {
                     'android:largeHeap': true,
                 },
             ],
-            ['@vali98/react-native-process-text', { label: 'Ask In ChatterUi' }],
+            ['@vali98/react-native-process-text', { label: 'Ask in PARC' }],
             [
                 'expo-camera',
                 {
-                    cameraPermission: 'Allow ChatterUI to access your camera',
+                    cameraPermission: 'Allow PARC to access your camera',
                 },
             ],
             ['expo-sqlite', { withSQLiteVecExtension: true }],
             [
                 'expo-image-picker',
                 {
-                    photosPermission: 'ChatterUI requires image permissions for vision models',
+                    photosPermission: 'PARC needs photo access for attached images',
                     colors: {
                         cropToolbarColor: '#000000',
                     },
