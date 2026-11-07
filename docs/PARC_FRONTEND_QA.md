@@ -24,8 +24,11 @@ Keep the original local database, GGUF engine and Android package identifier.
 
 ## PARC Studio redesign acceptance
 - [ ] Library uses the new compact masthead and single-column editorial story cards with 1:1 avatar portraits.
-- [ ] Character Editor shows five collapsible groups and a save bar outside the scroll area.
+- [ ] Character Editor shows six collapsible groups, including Roleplay Writing Style, and a save bar outside the scroll area.
 - [ ] Image Placement opens from avatar upload, supports drag/pinch/Reset and preserves original image.
+- [ ] Apply the 50/50 style preset, Save, close, reopen, and confirm text persists per character.
+- [ ] Confirm a style set on one character does not affect another card. Blank cards generate as before.
+- [ ] Verify the roleplay prompt includes writing-style instructions with a balanced dialogue/action-thought target.
 - [ ] Chat uses the chapter identity bar, readable transcript frames and a bottom composer dock.
 - [ ] The story archive opens and resumes chats without losing messages.
 - [ ] Samplers show Essentials and Advanced panels; changing settings preserves exact values.
