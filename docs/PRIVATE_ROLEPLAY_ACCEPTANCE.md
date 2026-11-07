@@ -11,6 +11,8 @@ Scope: private, single-user Android app on Samsung Galaxy S25. Local GGUF infere
 1. Launch offline. No blank/black screen, unwanted login or cloud request.
 2. Verify existing characters, images, histories and saved preferences remain after an in-place APK update.
 3. Open Character Editor. Edit a test card, Save, close and reopen, and verify the changes persist.
+   - In Roleplay Writing Style, apply the balanced 50/50 preset, save and reopen the card. Test an existing imported card with custom instructions separately; do not overwrite important data.
+   - Send a message and compare spoken dialogue to the combined action and thought narration. Treat 50/50 as a target, not an exact guarantee.
 4. Load Gemmasutra 4B GGUF from local storage. Send a short test prompt and confirm a usable response.
 5. During generation, verify streaming text, Stop button, then Regenerate and swipe controls.
 6. Create a new chat, switch chats, rename a chat, and return to the earlier history without losing messages.
