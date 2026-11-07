@@ -35,6 +35,7 @@ import { Theme } from '@lib/theme/ThemeManager'
 import CharacterEditorGuide from './CharacterEditorGuide'
 import ParcEditorSection from './ParcEditorSection'
 import CharacterConsistencyGuide from './CharacterConsistencyGuide'
+import { BALANCED_ROLEPLAY_WRITING_STYLE } from '@lib/engine/API/RoleplayStyle'
 
 const ChracterEditorScreen = () => {
     const { t } = useTranslation()
@@ -82,6 +83,28 @@ const ChracterEditorScreen = () => {
     const setCharacterCardEdited = (card: CharacterCardData) => {
         if (!edited) setEdited(true)
         setCharacterCard(card)
+    }
+
+    const handleApplyBalancedWritingStyle = () => {
+        if (!characterCard) return
+        const applyPreset = () => {
+            setCharacterCardEdited({
+                ...characterCard,
+                post_history_instructions: BALANCED_ROLEPLAY_WRITING_STYLE,
+            })
+        }
+        if (characterCard.post_history_instructions.trim()) {
+            Alert.alert({
+                title: 'Replace writing style?',
+                description: 'This will replace the writing instructions for this character. You can review them before saving.',
+                buttons: [
+                    { label: 'Cancel' },
+                    { label: 'Replace', onPress: applyPreset },
+                ],
+            })
+        } else {
+            applyPreset()
+        }
     }
 
     const handleSaveCard = async (): Promise<boolean> => {
@@ -572,7 +595,7 @@ const ChracterEditorScreen = () => {
                         </View>
 
                         </ParcEditorSection>
-                        <ParcEditorSection index="04" title="World & behaviour" subtitle="Personality, situation and dialogue style">
+                        <ParcEditorSection index="04" title="World & behaviour" subtitle="Personality, scenario and example dialogue">
                         <ThemedTextInput
                             label={t('character.editor.fields.personality')}
                             multiline
@@ -616,7 +639,66 @@ const ChracterEditorScreen = () => {
                         />
 
                         </ParcEditorSection>
-                        <ParcEditorSection index="05" title="Discovery tags" subtitle="Find and organise your characters">
+                        <ParcEditorSection
+                            index="05"
+                            title="ROLEPLAY WRITING STYLE"
+                            subtitle="Balance dialogue, actions and inner thoughts">
+                            <Text style={{
+                                color: color.text._400,
+                                fontSize: 12,
+                                lineHeight: 19,
+                            }}>
+                                Choose how this character responds. The 50/50 preset aims for
+                                equal-length spoken dialogue and combined actions and thoughts.
+                            </Text>
+                            <TouchableOpacity
+                                accessibilityRole="button"
+                                accessibilityLabel="Apply balanced 50/50 writing style"
+                                onPress={handleApplyBalancedWritingStyle}
+                                style={{
+                                    alignSelf: 'flex-start',
+                                    minHeight: 44,
+                                    justifyContent: 'center',
+                                    borderColor: '#70417D',
+                                    borderWidth: 1,
+                                    backgroundColor: '#34213F',
+                                    borderRadius: 12,
+                                    paddingHorizontal: 15,
+                                    paddingVertical: 10,
+                                }}>
+                                <Text style={{
+                                    color: '#98E8DE',
+                                    fontSize: 12,
+                                    fontWeight: '800',
+                                }}>
+                                    Apply balanced 50/50 preset
+                                </Text>
+                            </TouchableOpacity>
+                            <ThemedTextInput
+                                label="Writing instructions"
+                                multiline
+                                scrollEnabled
+                                numberOfLines={10}
+                                containerStyle={styles.input}
+                                placeholder="Add custom instructions, or apply the balanced preset above..."
+                                value={characterCard.post_history_instructions}
+                                onChangeText={(instructions) => {
+                                    setCharacterCardEdited({
+                                        ...characterCard,
+                                        post_history_instructions: instructions,
+                                    })
+                                }}
+                            />
+                            <Text style={{
+                                color: color.text._500,
+                                fontSize: 11,
+                                lineHeight: 17,
+                            }}>
+                                Saved per character. Applied during chat generation.
+                                The exact dialogue-to-narration ratio depends on the model.
+                            </Text>
+                        </ParcEditorSection>
+                        <ParcEditorSection index="06" title="Discovery tags" subtitle="Find and organise your characters">
                         <ParcTagPicker
                             label={t('character.editor.fields.tags')}
                             availableTags={data.data.map((item) => item.tag)}
