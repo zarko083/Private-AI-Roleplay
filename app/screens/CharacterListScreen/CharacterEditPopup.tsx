@@ -68,6 +68,7 @@ const CharacterEditPopup: React.FC<CharacterEditPopupProps> = ({
             }
             if (!chatId) {
                 Logger.errorToast(t('character.list.errors.chatCreationFailed'))
+                setNowLoading(false)
                 return
             }
             await setId(chatId)
