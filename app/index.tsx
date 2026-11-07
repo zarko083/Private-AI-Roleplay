@@ -58,11 +58,11 @@ const Home = () => {
                 <Text style={styles.subtitle} />
                 <ThemedButton
                     variant="secondary"
-                    label="Github"
+                    label="PARC Support"
                     iconName="github"
                     iconSize={20}
                     onPress={() => {
-                        Linking.openURL('https://github.com/Vali-98/ChatterUI')
+                        Linking.openURL('https://github.com/zarko083/Private-AI-Roleplay')
                     }}
                 />
             </View>
