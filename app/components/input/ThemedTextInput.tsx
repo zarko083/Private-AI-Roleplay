@@ -33,8 +33,10 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
             {label && (
                 <Text
                     style={{
-                        color: color.text._100,
+                        color: color.text._200,
                         marginBottom: 8,
+                        fontSize: 13,
+                        fontWeight: '600',
                     }}>
                     {label}
                 </Text>
@@ -46,11 +48,14 @@ const ThemedTextInput: React.FC<ThemedTextInputProps> = ({
                 style={[
                     {
                         color: color.text._100,
-                        borderColor: color.neutral._400,
+                        backgroundColor: color.neutral._200,
+                        borderColor: color.neutral._500,
                         borderWidth: 1,
-                        paddingVertical: 8,
+                        paddingVertical: 10,
                         paddingHorizontal: 12,
-                        borderRadius: 8,
+                        borderRadius: 12,
+                        minHeight: 44,
+                        fontSize: 14,
                         textAlignVertical: numberOfLines && numberOfLines > 1 ? `top` : `center`,
                     },
                     style,

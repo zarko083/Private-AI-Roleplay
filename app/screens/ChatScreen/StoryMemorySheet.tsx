@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import {
     ActivityIndicator,
+    Alert,
     KeyboardAvoidingView,
     Modal,
     Platform,
@@ -27,6 +28,7 @@ const StoryMemorySheet: React.FC<Props> = ({ visible, onClose }) => {
     const charId = Characters.useCharacterStore((state) => state.id)
     const [scope, setScope] = useState<MemoryScope>('chat')
     const [drafts, setDrafts] = useState({ chat: '', character: '' })
+    const [savedDrafts, setSavedDrafts] = useState({ chat: '', character: '' })
     const [loading, setLoading] = useState(false)
     const [saving, setSaving] = useState(false)
     const [message, setMessage] = useState('')
@@ -41,7 +43,10 @@ const StoryMemorySheet: React.FC<Props> = ({ visible, onClose }) => {
             charId ? StoryMemory.load('character', charId) : Promise.resolve(''),
         ])
             .then(([chat, character]) => {
-                if (!cancelled) setDrafts({ chat, character })
+                if (!cancelled) {
+                    setDrafts({ chat, character })
+                    setSavedDrafts({ chat, character })
+                }
             })
             .catch((error) => {
                 if (!cancelled) setMessage(`Unable to load memory: ${String(error)}`)
@@ -68,6 +73,8 @@ const StoryMemorySheet: React.FC<Props> = ({ visible, onClose }) => {
             if (persisted !== draft.trim().slice(0, MAX_MEMORY_CHARS)) {
                 throw new Error('Memory read-back did not match the saved text.')
             }
+            setSavedDrafts((previous) => ({ ...previous, [scope]: persisted }))
+            setDrafts((previous) => ({ ...previous, [scope]: persisted }))
             setMessage(
                 persisted
                     ? 'Memory verified on this device. It will be included in the next reply.'
@@ -78,6 +85,18 @@ const StoryMemorySheet: React.FC<Props> = ({ visible, onClose }) => {
         } finally {
             setSaving(false)
         }
+    }
+
+    const requestClose = () => {
+        if (saving) return
+        if (drafts.chat === savedDrafts.chat && drafts.character === savedDrafts.character) {
+            onClose()
+            return
+        }
+        Alert.alert('Discard unsaved memory?', 'Changes are only stored after Save memory.', [
+            { text: 'Keep editing', style: 'cancel' },
+            { text: 'Discard', style: 'destructive', onPress: onClose },
+        ])
     }
 
     const scopeButton = (value: MemoryScope, label: string) => (
@@ -113,12 +132,12 @@ const StoryMemorySheet: React.FC<Props> = ({ visible, onClose }) => {
             visible={visible}
             animationType="slide"
             transparent
-            onRequestClose={onClose}>
+            onRequestClose={requestClose}>
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : undefined}
                 style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: '#000000aa' }}>
                 <Pressable
-                    onPress={onClose}
+                    onPress={requestClose}
                     accessibilityLabel="Close memory panel"
                     style={{ flex: 1 }}
                 />
@@ -187,7 +206,7 @@ const StoryMemorySheet: React.FC<Props> = ({ visible, onClose }) => {
                                         minHeight: 174,
                                         padding: 14,
                                         color: color.text._100,
-                                        borderColor: color.primary._400,
+                                        borderColor: color.primary._600,
                                         backgroundColor: color.neutral._200,
                                         borderWidth: 1,
                                         borderRadius: 16,
@@ -215,13 +234,13 @@ const StoryMemorySheet: React.FC<Props> = ({ visible, onClose }) => {
                             disabled={!ownerId || loading || saving}
                             onPress={save}
                             style={{
-                                backgroundColor: ownerId && !saving ? color.primary._500 : color.neutral._400,
+                                backgroundColor: ownerId && !saving ? color.primary._700 : color.neutral._400,
                                 borderRadius: 14,
                                 alignItems: 'center',
                                 paddingVertical: 14,
                                 marginTop: 16,
                             }}>
-                            <Text style={{ color: color.text._100, fontWeight: '800', fontSize: 15 }}>
+                            <Text style={{ color: '#FFFFFF', fontWeight: '800', fontSize: 15 }}>
                                 {saving ? 'Saving...' : 'Save memory'}
                             </Text>
                         </Pressable>

@@ -43,6 +43,12 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
     const [threadCount] = useMMKVNumber(Global.CPUThreads)
     const [kvSize, setKVSize] = useState(0)
     const [selectedPreset, setSelectedPreset] = useState<PresetName | null>(null)
+    const currentProfile = selectedPreset ?? (
+        config?.context_length === 2048 && config?.batch === 256 ? 'FAST'
+        : config?.context_length === 4096 && config?.batch === 512 ? 'BALANCED'
+        : config?.context_length === 6144 && config?.batch === 512 ? 'STORY'
+        : null
+    )
 
     const getKVSize = async () => setKVSize(await KV.getKVSize())
     useEffect(() => { KV.getKVSize().then(setKVSize) }, [])
@@ -120,8 +126,8 @@ const ModelSettings: React.FC<ModelSettingsProp> = ({ modelImporting, modelLoadi
                                 borderRadius: 13,
                                 borderWidth: 1,
                                 opacity: modelImporting || modelLoading ? 0.5 : 1,
-                                borderColor: selectedPreset === id ? color.primary._500 : color.neutral._400,
-                                backgroundColor: selectedPreset === id ? color.primary._100 : color.neutral._300,
+                                borderColor: currentProfile === id ? color.primary._700 : color.neutral._400,
+                                backgroundColor: currentProfile === id ? color.primary._100 : color.neutral._300,
                             }}>
                             <Text style={{ color: color.text._100, fontWeight: '700', fontSize: 12 }}>{title}</Text>
                             <Text style={{ color: color.text._400, fontSize: 10, marginTop: 3 }}>{subtitle}</Text>

@@ -46,7 +46,7 @@ export const useInputHeightStore = create<ChatInputHeightStoreProps>()((set) => 
     setHeight: (n) => set({ height: Math.ceil(n) }),
 }))
 
-/** Private Roleplay composer. Original send / regenerate / attachment paths are preserved. */
+/** PARC composer. Original send / regenerate / attachment paths are preserved. */
 const ChatInput = () => {
     const { t } = useTranslation()
     const inputRef = useUnfocusTextInput()
@@ -162,7 +162,7 @@ const ChatInput = () => {
                 padding: 8,
                 backgroundColor: color.neutral._200,
                 borderWidth: 1,
-                borderColor: color.neutral._400,
+                borderColor: color.primary._200,
                 borderRadius: 18,
                 rowGap: 6,
             }}>
@@ -175,10 +175,10 @@ const ChatInput = () => {
                     marginLeft: 5,
                 }}>
                 {nowGenerating
-                    ? `AI IS WRITING · ${generationSeconds}s · TAP STOP TO END`
+                    ? `GENERATING · ${generationSeconds}s · STOP TO END`
                     : activeProvider
-                      ? 'YOUR NEXT SCENE'
-                      : 'CHOOSE A MODEL TO START CHATTING'}
+                      ? 'MESSAGE'
+                      : 'LOAD A MODEL TO CHAT'}
             </Text>
 
             {attachments.length > 0 && (
@@ -270,7 +270,7 @@ const ChatInput = () => {
                         minHeight: 42,
                         maxHeight: 150,
                         borderWidth: 1,
-                        borderColor: activeProvider ? color.primary._300 : color.neutral._400,
+                        borderColor: activeProvider ? color.primary._600 : color.neutral._400,
                         borderRadius: 16,
                         paddingHorizontal: 12,
                         paddingVertical: 9,
@@ -279,13 +279,13 @@ const ChatInput = () => {
                     numberOfLines={8}
                     placeholder={
                         activeProvider
-                            ? 'Write your next message...'
+                            ? 'Write a message...'
                             : mode === 'local'
                               ? 'Tap to load a local model'
                               : 'Tap to connect a provider'
                     }
                     editable={activeProvider}
-                    placeholderTextColor={color.text._700}
+                    placeholderTextColor={color.text._500}
                     value={newMessage}
                     onChangeText={setNewMessage}
                     multiline
@@ -311,7 +311,7 @@ const ChatInput = () => {
                     onPress={nowGenerating ? abortResponse : handleSend}>
                     <MaterialIcons
                         name={nowGenerating ? 'stop' : 'send'}
-                        color={activeProvider ? color.neutral._100 : color.text._700}
+                        color={activeProvider ? '#FFFFFF' : color.text._700}
                         size={23}
                     />
                 </TouchableOpacity>

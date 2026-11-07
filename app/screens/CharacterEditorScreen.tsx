@@ -289,9 +289,9 @@ const ChracterEditorScreen = () => {
                         bottomOffset={16}
                         showsVerticalScrollIndicator={false}
                         keyboardShouldPersistTaps="always"
-                        contentContainerStyle={{ rowGap: 8, paddingBottom: 24 }}>
+                        contentContainerStyle={{ rowGap: 12, paddingBottom: 36 }}>
                         <CharacterEditorGuide name={characterCard.name} descriptionTokens={descriptionTokens} edited={edited} />
-                        <EditorChapter title="IDENTITY" description="Set an image and name for your character." />
+                        <EditorChapter title="IDENTITY" description="Portrait and character name" />
                         <View style={styles.characterHeader}>
                             <ContextMenu
                                 placement="right"
@@ -382,7 +382,7 @@ const ChracterEditorScreen = () => {
                         </View>
 
                         <CharacterConsistencyGuide description={characterCard.description} personality={characterCard.personality} scenario={characterCard.scenario} firstMessage={characterCard.first_mes} exampleMessages={characterCard.mes_example} />
-                        <EditorChapter title="CORE CHARACTER" description="Describe the character, voice, appearance and important details." />
+                        <EditorChapter title="CORE CHARACTER" description="Identity, behaviour and defining details" />
                         <ThemedTextInput
                             scrollEnabled
                             label={t('character.editor.metrics.descriptionTokens', {
@@ -390,7 +390,7 @@ const ChracterEditorScreen = () => {
                             })}
                             multiline
                             containerStyle={styles.input}
-                            numberOfLines={16}
+                            numberOfLines={8}
                             onChangeText={(mes) => {
                                 setCharacterCardEdited({
                                     ...characterCard,
@@ -400,7 +400,7 @@ const ChracterEditorScreen = () => {
                             value={characterCard?.description}
                         />
 
-                        <EditorChapter title="OPENING SCENE" description="Set the first message and alternate greetings." />
+                        <EditorChapter title="OPENING SCENE" description="Greetings for new conversations" />
                         <ThemedTextInput
                             label={t('character.editor.fields.firstMessage')}
                             multiline
@@ -412,7 +412,7 @@ const ChracterEditorScreen = () => {
                                 })
                             }}
                             value={characterCard?.first_mes}
-                            numberOfLines={16}
+                            numberOfLines={7}
                         />
                         <View style={styles.input}>
                             <View
@@ -494,7 +494,7 @@ const ChracterEditorScreen = () => {
                             {characterCard.alternate_greetings.length !== 0 ? (
                                 <ThemedTextInput
                                     multiline
-                                    numberOfLines={16}
+                                    numberOfLines={7}
                                     onChangeText={(mes) => {
                                         const greetings = [...characterCard.alternate_greetings]
                                         greetings[altSwipeIndex].greeting = mes
@@ -523,7 +523,7 @@ const ChracterEditorScreen = () => {
                             )}
                         </View>
 
-                        <EditorChapter title="WORLD & BEHAVIOUR" description="Define personality, scenario, examples and discovery tags." />
+                        <EditorChapter title="WORLD & BEHAVIOUR" description="Personality, scenario and searchable tags" />
                         <ThemedTextInput
                             label={t('character.editor.fields.personality')}
                             multiline
@@ -563,7 +563,7 @@ const ChracterEditorScreen = () => {
                                 })
                             }}
                             value={characterCard?.mes_example}
-                            numberOfLines={16}
+                            numberOfLines={8}
                         />
 
                         <ParcTagPicker
@@ -621,7 +621,7 @@ const useStyles = () => {
         },
 
         characterHeaderInfo: {
-            marginLeft: spacing.xl2,
+            marginLeft: spacing.l,
             rowGap: 12,
             flex: 1,
         },
@@ -630,7 +630,9 @@ const useStyles = () => {
             backgroundColor: color.neutral._100,
             paddingVertical: 12,
             paddingHorizontal: 12,
-            borderRadius: 8,
+            borderRadius: 14,
+            borderWidth: 1,
+            borderColor: color.neutral._400,
         },
 
         buttonContainer: {
@@ -640,9 +642,9 @@ const useStyles = () => {
         },
 
         avatar: {
-            width: 80,
-            height: 80,
-            borderRadius: borderRadius.xl2,
+            width: 94,
+            height: 94,
+            borderRadius: borderRadius.xl,
             borderColor: color.primary._500,
             borderWidth: 2,
         },

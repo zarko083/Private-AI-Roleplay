@@ -44,8 +44,8 @@ const useButtonTheme = (variant: ButtonVariant): ButtonTheme => {
         case 'primary':
             return {
                 buttonStyle: {
-                    backgroundColor: theme.color.primary._500,
-                    borderColor: theme.color.primary._200,
+                    backgroundColor: theme.color.primary._700,
+                    borderColor: theme.color.primary._600,
                     borderWidth: theme.borderWidth.m,
                     paddingVertical: theme.spacing.m,
                     paddingHorizontal: theme.spacing.xl,
@@ -53,21 +53,22 @@ const useButtonTheme = (variant: ButtonVariant): ButtonTheme => {
                 },
                 labelStyle: {
                     textAlign: 'center',
-                    color: theme.color.text._900,
+                    color: '#FFFFFF',
                 },
             }
         case 'secondary':
             return {
                 buttonStyle: {
-                    borderColor: theme.color.primary._400,
-                    borderWidth: theme.borderWidth.m,
+                    backgroundColor: theme.color.primary._100,
+                    borderColor: theme.color.primary._500,
+                    borderWidth: theme.borderWidth.s,
                     paddingVertical: theme.spacing.m,
                     paddingHorizontal: theme.spacing.xl,
                     borderRadius: theme.borderRadius.m,
                 },
                 labelStyle: {
                     textAlign: 'center',
-                    color: theme.color.primary._700,
+                    color: theme.color.primary._900,
                 },
             }
         case 'tertiary':
