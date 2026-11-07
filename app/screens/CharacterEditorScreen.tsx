@@ -17,6 +17,7 @@ import ParcTagPicker from '@components/input/ParcTagPicker'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import Alert from '@components/views/Alert'
 import Avatar from '@components/views/Avatar'
+import AvatarPlacementModal from '@components/views/AvatarPlacementModal'
 import AvatarViewer from '@components/views/AvatarViewer'
 import ContextMenu from '@components/views/ContextMenu'
 import HeaderButton from '@components/views/HeaderButton'
@@ -27,6 +28,8 @@ import { useDebounceTokenizer } from '@lib/hooks/Tokenizer'
 import { CharacterCardData, Characters } from '@lib/state/Characters'
 import { Chats } from '@lib/state/Chat'
 import { useAvatarViewerStore } from '@lib/state/components/AvatarViewer'
+import { useAvatarPlacementStore } from '@lib/state/AvatarPlacement'
+import type { AvatarPlacement } from '@lib/utils/AvatarPlacement'
 import { Logger } from '@lib/state/Logger'
 import { Theme } from '@lib/theme/ThemeManager'
 import CharacterEditorGuide, { EditorChapter } from './CharacterEditorGuide'
@@ -68,6 +71,11 @@ const ChracterEditorScreen = () => {
     )
     const setShowViewer = useAvatarViewerStore((state) => state.setShow)
     const [edited, setEdited] = useState(false)
+    const [avatarEdit, setAvatarEdit] = useState<{ uri: string; existing: boolean } | null>(null)
+    const setAvatarPlacement = useAvatarPlacementStore((state) => state.setPlacement)
+    const existingPlacement = useAvatarPlacementStore((state) =>
+        state.placements[currentCard?.image_id ?? -1]
+    )
     const [altSwipeIndex, setAltSwipeIndex] = useState(0)
 
     const setCharacterCardEdited = (card: CharacterCardData) => {
@@ -167,10 +175,13 @@ const ChracterEditorScreen = () => {
                 { label: t('common.actions.cancel') },
                 {
                     label: t('character.editor.dialogs.deleteImage.confirm'),
-                    onPress: () => {
-                        if (currentCard) {
-                            Characters.db.mutate.deleteImage(currentCard.id)
-                            Characters.deleteImage(currentCard.image_id)
+                    onPress: async () => {
+                        if (currentCard && charId) {
+                            await Characters.db.mutate.deleteImage(currentCard.id)
+                            await Characters.deleteImage(currentCard.image_id)
+                            await setCurrentCard(charId)
+                            setCharacterCard((previous) => previous
+                                ? { ...previous, image_id: -1 } : previous)
                         }
                     },
                     type: 'warning',
@@ -179,14 +190,40 @@ const ChracterEditorScreen = () => {
         })
     }
 
-    const handleImportImage = () => {
-        DocumentPicker.getDocumentAsync({
-            copyToCacheDirectory: true,
-            type: 'image/*',
-        }).then((result: DocumentPicker.DocumentPickerResult) => {
-            if (result.canceled || !charId) return
-            Characters.useCharacterStore.getState().updateImage(result.assets[0].uri)
+    const handleImportImage = async () => {
+        const result: DocumentPicker.DocumentPickerResult =
+            await DocumentPicker.getDocumentAsync({
+                copyToCacheDirectory: true,
+                type: 'image/*',
+            })
+        if (result.canceled || !charId) return
+        setAvatarEdit({ uri: result.assets[0].uri, existing: false })
+    }
+
+    const handleAdjustImage = () => {
+        const imageId = currentCard?.image_id
+        if (!imageId || imageId <= 0) return
+        setAvatarEdit({
+            uri: Characters.getImageDir(imageId),
+            existing: true,
         })
+    }
+
+    const saveAvatarPlacement = async (placement: AvatarPlacement) => {
+        if (!avatarEdit || !charId) return
+        if (avatarEdit.existing) {
+            const imageId = currentCard?.image_id
+            if (!imageId || imageId <= 0) throw new Error('No avatar to adjust')
+            setAvatarPlacement(imageId, placement)
+        } else {
+            const imageId = await Characters.useCharacterStore
+                .getState().updateImage(avatarEdit.uri)
+            if (!imageId) throw new Error('Unable to import avatar')
+            setAvatarPlacement(imageId, placement)
+            setCharacterCard((previous) => previous
+                ? { ...previous, image_id: imageId } : previous)
+        }
+        setAvatarEdit(null)
     }
 
     const handleAddAltMessage = async () => {
@@ -283,6 +320,13 @@ const ChracterEditorScreen = () => {
                 }}>
                 <HeaderTitle title={t('character.editor.title')} />
                 <AvatarViewer editorButton={false} />
+                <AvatarPlacementModal
+                    visible={avatarEdit !== null}
+                    sourceUri={avatarEdit?.uri ?? ''}
+                    initialPlacement={avatarEdit?.existing ? existingPlacement : undefined}
+                    onCancel={() => setAvatarEdit(null)}
+                    onSave={saveAvatarPlacement}
+                />
 
                 {characterCard && (
                     <KeyboardAwareScrollView
@@ -302,6 +346,15 @@ const ChracterEditorScreen = () => {
                                         onPress: (close) => {
                                             close()
                                             handleImportImage()
+                                        },
+                                    },
+                                    {
+                                        label: 'Adjust Image Placement',
+                                        icon: 'edit',
+                                        disabled: !currentCard?.image_id || currentCard.image_id <= 0,
+                                        onPress: (close) => {
+                                            close()
+                                            handleAdjustImage()
                                         },
                                     },
                                     {

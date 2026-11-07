@@ -11,10 +11,13 @@ import ThemedButton from '@components/buttons/ThemedButton'
 import ThemedTextInput from '@components/input/ThemedTextInput'
 import Alert from '@components/views/Alert'
 import Avatar from '@components/views/Avatar'
+import AvatarPlacementModal from '@components/views/AvatarPlacementModal'
 import AvatarViewer from '@components/views/AvatarViewer'
 import ContextMenu from '@components/views/ContextMenu'
 import { CharacterCardData, Characters } from '@lib/state/Characters'
 import { useAvatarViewerStore } from '@lib/state/components/AvatarViewer'
+import { useAvatarPlacementStore } from '@lib/state/AvatarPlacement'
+import type { AvatarPlacement } from '@lib/utils/AvatarPlacement'
 import { Theme } from '@lib/theme/ThemeManager'
 
 const UserCardEditor = () => {
@@ -23,6 +26,8 @@ const UserCardEditor = () => {
     const { color, spacing } = Theme.useTheme()
     const navigation = useNavigation()
     const [edited, setEdited] = useState(false)
+    const [avatarEdit, setAvatarEdit] = useState<{ uri: string; existing: boolean } | null>(null)
+    const setAvatarPlacement = useAvatarPlacementStore((state) => state.setPlacement)
     const { userCard, imageID, id, setCard, updateImage } = Characters.useUserStore(
         useShallow((state) => ({
             userCard: state.card,
@@ -32,6 +37,8 @@ const UserCardEditor = () => {
             updateImage: state.updateImage,
         }))
     )
+
+    const existingPlacement = useAvatarPlacementStore((state) => state.placements[imageID ?? -1])
 
     const [currentCard, setCurrentCard] = useState<CharacterCardData | undefined>(userCard)
 
@@ -55,14 +62,33 @@ const UserCardEditor = () => {
         }
     }
 
-    const handleUploadImage = () => {
-        DocumentPicker.getDocumentAsync({
+    const handleUploadImage = async () => {
+        const result = await DocumentPicker.getDocumentAsync({
             copyToCacheDirectory: true,
             type: 'image/*',
-        }).then((result) => {
-            if (result.canceled) return
-            if (id) updateImage(result.assets[0].uri)
         })
+        if (result.canceled || !id) return
+        setAvatarEdit({ uri: result.assets[0].uri, existing: false })
+    }
+
+    const handleAdjustImage = () => {
+        if (!imageID || imageID <= 0) return
+        setAvatarEdit({ uri: Characters.getImageDir(imageID), existing: true })
+    }
+
+    const saveAvatarPlacement = async (placement: AvatarPlacement) => {
+        if (!avatarEdit || !id) return
+        if (avatarEdit.existing) {
+            if (!imageID || imageID <= 0) throw new Error('No avatar to adjust')
+            setAvatarPlacement(imageID, placement)
+        } else {
+            const newImageId = await updateImage(avatarEdit.uri)
+            if (!newImageId) throw new Error('Unable to import avatar')
+            setAvatarPlacement(newImageId, placement)
+            setCurrentCard((previous) => previous
+                ? { ...previous, image_id: newImageId } : previous)
+        }
+        setAvatarEdit(null)
     }
 
     const handleDeleteImage = () => {
@@ -73,10 +99,11 @@ const UserCardEditor = () => {
                 { label: t('common.actions.cancel') },
                 {
                     label: t('users.edit.image.delete'),
-                    onPress: () => {
-                        if (currentCard) {
-                            Characters.db.mutate.deleteImage(currentCard.id)
-                            Characters.deleteImage(imageID)
+                    onPress: async () => {
+                        if (currentCard && id) {
+                            await Characters.db.mutate.deleteImage(currentCard.id)
+                            await Characters.deleteImage(imageID)
+                            await setCard(id)
                         }
                     },
                     type: 'warning',
@@ -113,6 +140,13 @@ const UserCardEditor = () => {
     return (
         <View style={styles.userContainer}>
             <AvatarViewer editorButton={false} />
+            <AvatarPlacementModal
+                visible={avatarEdit !== null}
+                sourceUri={avatarEdit?.uri ?? ''}
+                initialPlacement={avatarEdit?.existing ? existingPlacement : undefined}
+                onCancel={() => setAvatarEdit(null)}
+                onSave={saveAvatarPlacement}
+            />
             <View style={styles.nameBar}>
                 <ContextMenu
                     placement="right"
@@ -123,6 +157,15 @@ const UserCardEditor = () => {
                             onPress: (close) => {
                                 close()
                                 handleUploadImage()
+                            },
+                        },
+                        {
+                            label: 'Adjust Image Placement',
+                            icon: 'edit',
+                            disabled: !imageID || imageID <= 0,
+                            onPress: (close) => {
+                                close()
+                                handleAdjustImage()
                             },
                         },
                         {

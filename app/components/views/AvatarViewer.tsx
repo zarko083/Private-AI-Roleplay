@@ -75,6 +75,7 @@ const AvatarViewer: React.FC<AvatarViewerProps> = ({ editorButton = true }) => {
                 <Animated.View style={styles.bodyContainer} entering={FadeInDown}>
                     <Avatar
                         contentFit="cover"
+                        usePlacement={false}
                         targetImage={Characters.getImageDir(imageId ?? -1)}
                         style={[styles.avatar, { aspectRatio: aspectRatio }]}
                     />

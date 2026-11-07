@@ -20,6 +20,7 @@ import {
 } from '@db/schema'
 import { Tokenizer } from '@lib/engine/Tokenizer'
 import { Storage } from '@lib/enums/Storage'
+import { useAvatarPlacementStore } from '@lib/state/AvatarPlacement'
 import {
     copyFile,
     deleteFile,
@@ -66,7 +67,7 @@ type CharacterCardState = {
     setCard: (id: number) => Promise<string | undefined>
     unloadCard: () => void
     getImage: () => string
-    updateImage: (sourceURI: string) => void
+    updateImage: (sourceURI: string) => Promise<number | undefined>
     getCache: (otherName: string) => Promise<CharacterTokenCache>
 }
 
@@ -107,18 +108,25 @@ export namespace Characters {
                 },
                 updateImage: async (sourceURI: string) => {
                     const id = get().id
-                    const oldImageID = get().card?.image_id
                     const card = get().card
-                    if (!id || !oldImageID || !card) {
+                    if (!id || !card) {
                         Logger.errorToast(t('common.errors.couldNotGetData'))
                         return
                     }
+                    const oldImageID = card.image_id
                     const imageID = Date.now()
-                    await db.mutate.updateCardField('image_id', imageID, id)
-                    await deleteImage(oldImageID)
-                    await copyImage(sourceURI, imageID)
-                    card.image_id = imageID
-                    set({ card })
+                    if (!(await copyImage(sourceURI, imageID))) {
+                        throw new Error('Unable to copy avatar image to app storage')
+                    }
+                    try {
+                        await db.mutate.updateCardField('image_id', imageID, id)
+                        set({ card: { ...card, image_id: imageID } })
+                        if (oldImageID > 0 && oldImageID !== imageID) await deleteImage(oldImageID)
+                        return imageID
+                    } catch (error) {
+                        await deleteImage(imageID)
+                        throw error
+                    }
                 },
                 getCache: async (userName: string) => {
                     const cache = get().tokenCache
@@ -194,18 +202,25 @@ export namespace Characters {
         },
         updateImage: async (sourceURI: string) => {
             const id = get().id
-            const oldImageID = get().card?.image_id
             const card = get().card
-            if (!id || !oldImageID || !card) {
+            if (!id || !card) {
                 Logger.errorToast(t('common.errors.couldNotGetData'))
                 return
             }
+            const oldImageID = card.image_id
             const imageID = Date.now()
-            await db.mutate.updateCardField('image_id', imageID, id)
-            await deleteImage(oldImageID)
-            await copyImage(sourceURI, imageID)
-            card.image_id = imageID
-            set({ card })
+            if (!(await copyImage(sourceURI, imageID))) {
+                throw new Error('Unable to copy avatar image to app storage')
+            }
+            try {
+                await db.mutate.updateCardField('image_id', imageID, id)
+                set({ card: { ...card, image_id: imageID } })
+                if (oldImageID > 0 && oldImageID !== imageID) await deleteImage(oldImageID)
+                return imageID
+            } catch (error) {
+                await deleteImage(imageID)
+                throw error
+            }
         },
         getCache: async (charName: string) => {
             const cache = get().tokenCache
@@ -822,11 +837,13 @@ export namespace Characters {
     }
 
     export const deleteImage = async (imageID: number) => {
-        await deleteFile(getImageDir(imageID))
+        if (imageID <= 0) return
+        const deleted = await deleteFile(getImageDir(imageID))
+        if (deleted) useAvatarPlacementStore.getState().removePlacement(imageID)
     }
 
     export const copyImage = async (uri: string, imageID: number) => {
-        copyFile({
+        return await copyFile({
             from: uri,
             to: getImageDir(imageID),
         })
