@@ -675,7 +675,7 @@ const ChracterEditorScreen = () => {
                                 </Text>
                             </TouchableOpacity>
                             <ThemedTextInput
-                                label="Writing instructions"
+                                label="Roleplay response instructions"
                                 multiline
                                 scrollEnabled
                                 numberOfLines={10}
