@@ -19,7 +19,12 @@ type CharacterListingProps = {
     setNowLoading: (b: boolean) => void
 }
 
-/** Poster-style character card; original tap/long-press action is retained. */
+/**
+ * PARC character tile.
+ * The character image uses a true 1:1 square. Labels and the action sit
+ * underneath the avatar so they never hide a face or crop over the portrait.
+ * CharacterEditPopup continues to own tap and long-press actions.
+ */
 const CharacterListing: React.FC<CharacterListingProps> = ({
     character,
     nowLoading,
@@ -35,41 +40,45 @@ const CharacterListing: React.FC<CharacterListingProps> = ({
         }))
     )
     const styles = useStyles()
-    const { color } = Theme.useTheme()
     const hasChat = character.latestSwipe !== undefined && Boolean(character.latestName)
     const preview = hasChat
         ? `${character.latestName}: ${character.latestSwipe?.trim() ?? ''}`
         : t('character.list.emptyStates.noMessages')
 
     return (
-        <View style={{ flex: 1 }}>
+        <View style={styles.root}>
             <CharacterEditPopup
                 character={character}
                 setNowLoading={setNowLoading}
                 nowLoading={nowLoading}>
                 <View style={styles.card}>
-                    <Avatar
-                        targetImage={Characters.getImageDir(character.image_id)}
-                        style={styles.cover}
-                        contentFit="cover"
-                    />
-                    <LinearGradient
-                        colors={['transparent', 'rgba(9, 7, 18, 0.65)', 'rgba(9, 7, 18, 0.99)']}
-                        locations={[0, 0.38, 1]}
-                        style={styles.gradient}>
-                        <Text style={styles.name} numberOfLines={2}>
+                    <View style={styles.avatarFrame}>
+                        <Avatar
+                            targetImage={Characters.getImageDir(character.image_id)}
+                            style={styles.squareAvatar}
+                            contentFit="cover"
+                            accessibilityLabel={`${character.name} avatar`}
+                        />
+                        <View style={styles.cornerAccent} pointerEvents="none" />
+                    </View>
+                    <View style={styles.details}>
+                        <Text style={styles.name} numberOfLines={1}>
                             {character.name}
                         </Text>
-                        <Text style={styles.preview} numberOfLines={2}>
+                        <Text style={styles.preview} numberOfLines={1}>
                             {preview}
                         </Text>
-                        <View style={styles.bottomRow}>
-                            <Text style={styles.action} numberOfLines={1}>
-                                {hasChat ? 'CONTINUE STORY' : 'START STORY'}
+                        <LinearGradient
+                            colors={['#D552A3', '#8E1EA2', '#542177']}
+                            start={{ x: 0, y: 0.5 }}
+                            end={{ x: 1, y: 0.5 }}
+                            style={styles.actionPill}>
+                            <Text style={styles.actionText} numberOfLines={1}>
+                                {hasChat ? 'CONTINUE' : 'START STORY'}
                             </Text>
-                            <Text style={{ color: color.primary._900, fontSize: 18 }}>›</Text>
-                        </View>
-                    </LinearGradient>
+                            <Text style={styles.chevron}>›</Text>
+                        </LinearGradient>
+                    </View>
                 </View>
             </CharacterEditPopup>
             <CharacterListingTags
@@ -91,56 +100,77 @@ const useStyles = () => {
     const { color } = Theme.useTheme()
 
     return StyleSheet.create({
+        root: {
+            flex: 1,
+            minWidth: 0,
+        },
         card: {
             overflow: 'hidden',
-            borderRadius: 20,
+            borderRadius: 18,
             borderWidth: 1,
-            borderColor: color.neutral._400,
+            borderColor: 'rgba(152, 232, 222, 0.22)',
             backgroundColor: color.neutral._200,
         },
-        cover: {
+        avatarFrame: {
             width: '100%',
-            aspectRatio: 0.68,
+            aspectRatio: 1,
+            overflow: 'hidden',
             backgroundColor: color.neutral._300,
         },
-        gradient: {
+        squareAvatar: {
+            width: '100%',
+            height: '100%',
+        },
+        cornerAccent: {
             position: 'absolute',
-            bottom: 0,
-            left: 0,
             right: 0,
-            paddingHorizontal: 13,
-            paddingTop: 80,
-            paddingBottom: 13,
-            justifyContent: 'flex-end',
+            bottom: 0,
+            width: 28,
+            height: 3,
+            borderTopLeftRadius: 3,
+            backgroundColor: '#98E8DE',
+        },
+        details: {
+            paddingTop: 11,
+            paddingBottom: 12,
+            paddingHorizontal: 11,
         },
         name: {
-            color: '#FFFFFF',
-            fontSize: 17,
+            color: color.text._100,
+            fontSize: 16,
             fontWeight: '800',
             letterSpacing: -0.3,
         },
         preview: {
-            color: '#D3CEDD',
-            marginTop: 5,
+            marginTop: 4,
+            color: color.text._400,
             fontSize: 11,
-            lineHeight: 15,
-            minHeight: 15,
+            lineHeight: 16,
+            minHeight: 16,
         },
-        bottomRow: {
-            marginTop: 12,
-            borderTopWidth: StyleSheet.hairlineWidth,
-            borderColor: 'rgba(255,255,255,0.22)',
-            paddingTop: 9,
+        actionPill: {
+            marginTop: 11,
+            borderRadius: 99,
+            paddingVertical: 9,
+            paddingHorizontal: 10,
+            minHeight: 35,
             flexDirection: 'row',
+            justifyContent: 'center',
             alignItems: 'center',
-            justifyContent: 'space-between',
+            columnGap: 6,
         },
-        action: {
-            fontSize: 10,
+        actionText: {
+            color: '#FFFFFF',
+            fontSize: 11,
             fontWeight: '800',
-            color: '#C9B2FF',
-            letterSpacing: 1,
-            flex: 1,
+            letterSpacing: 0.5,
+            flexShrink: 1,
+        },
+        chevron: {
+            color: '#98E8DE',
+            fontSize: 18,
+            fontWeight: '700',
+            lineHeight: 18,
         },
     })
 }
