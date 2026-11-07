@@ -41,7 +41,7 @@ jobs:
       - name: Verify TypeScript
         run: npx tsc --noEmit
       - name: Run pinned memory regression tests
-        run: npx jest lib/engine/API/PinnedMemory.test.ts lib/engine/API/NameContext.test.ts lib/constants/ParcTags.test.ts lib/theme/ParcTheme.test.ts lib/utils/AvatarPlacement.test.ts --runInBand --watch=false --ci
+        run: npx jest lib/engine/API/PinnedMemory.test.ts lib/engine/API/NameContext.test.ts lib/engine/API/RoleplayStyle.test.ts lib/constants/ParcTags.test.ts lib/theme/ParcTheme.test.ts lib/utils/AvatarPlacement.test.ts --runInBand --watch=false --ci
 
   build-release-apk:
     needs: check-frontend
