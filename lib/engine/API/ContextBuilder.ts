@@ -15,6 +15,7 @@ import { Macro } from '@lib/utils/Macros'
 
 import { APIConfiguration, APIValues } from './APIBuilder.types'
 import { formatPinnedMemoryPrompt } from './PinnedMemory'
+import { formatNameAddressingRule } from './NameAddressing'
 import type { DataSource, DataSourceResult } from '../DataSources/types'
 
 export type MessageLoader = {
@@ -116,6 +117,16 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
         usePrefix,
         useSuffix,
     })
+
+    // Optional PARC user-name preference applies to both on-device GGUF and remote API engines.
+    // It uses the User Card bound to this conversation, not an unrelated global profile.
+    if (mmkv.getBoolean(AppSettings.AddressUserByName)) {
+        const addressRule = formatNameAddressingRule(user?.name)
+        if (addressRule) {
+            systemPrompt += '\n' + addressRule
+            systemPromptLength += await tokenizer(addressRule)
+        }
+    }
 
     const reservedBudget = sortedDataSources.reduce((acc, curr) => acc + curr.tokenBudget, 0)
 
