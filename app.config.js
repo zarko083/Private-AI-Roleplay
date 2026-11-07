@@ -1,4 +1,4 @@
-// PARC mobile frontend QA candidate: branded theme, assets and all major screens.
+// PARC mobile QA candidate: branded UI, Include Names, non-destructive Avatar Pan & Zoom.
 const IS_DEV = process.env.APP_VARIANT === 'development'
 
 module.exports = {
