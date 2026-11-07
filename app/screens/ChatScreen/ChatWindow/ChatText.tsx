@@ -5,13 +5,15 @@ import Markdown from 'react-native-markdown-display'
 
 import ThemedButton from '@components/buttons/ThemedButton'
 import { useTextFilter } from '@lib/hooks/TextFilter'
+import { stripLeadingSpeakerPrefix } from '@lib/engine/API/NameContext'
 import { MarkdownStyle } from '@lib/markdown/Markdown'
 
 type ChatTextProps = {
     swipeText: string
+    speakerName?: string
 }
 
-const ChatText: React.FC<ChatTextProps> = ({ swipeText }) => {
+const ChatText: React.FC<ChatTextProps> = ({ swipeText, speakerName }) => {
     const { t } = useTranslation()
     const { markdown, rules, style } = MarkdownStyle.useCustomFormatting()
     const [showHidden, setShowHidden] = useState(false)
@@ -44,7 +46,10 @@ const ChatText: React.FC<ChatTextProps> = ({ swipeText }) => {
     }
 
     const filteredText = useTextFilter(swipeText?.trim() ?? '')
-    const renderedText = showHidden ? swipeText?.trim() : filteredText.result
+    const renderedText = stripLeadingSpeakerPrefix(
+        showHidden ? swipeText?.trim() ?? '' : filteredText.result,
+        speakerName
+    )
     return (
         <Animated.View style={{ overflow: 'scroll', height: animHeight }}>
             <View style={{ minHeight: 10 }} ref={viewRef} onLayout={updateHeight}>
