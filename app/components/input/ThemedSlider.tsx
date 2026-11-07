@@ -1,10 +1,10 @@
 import Slider from '@react-native-community/slider'
-import { useCallback, useState } from 'react'
-import { StyleSheet, Text, TextInput, View } from 'react-native'
+import { useCallback, useEffect, useState } from 'react'
+import { Text, TextInput, View } from 'react-native'
 
 import { Theme } from '@lib/theme/ThemeManager'
 
-type ThemedSliderProps = {
+type Props = {
     label: string
     value: number
     onValueChange: (value: number) => void
@@ -16,10 +16,14 @@ type ThemedSliderProps = {
     disabled?: boolean
 }
 
-const clamp = (val: number, min: number, max: number, precision: number) =>
-    Math.min(Math.max(parseFloat(val?.toFixed(precision) ?? 0), min), max)
+const clamp = (value: number, min: number, max: number, precision: number) =>
+    Math.min(Math.max(Number(value.toFixed(precision)), min), max)
 
-const ThemedSlider: React.FC<ThemedSliderProps> = ({
+/**
+ * PARC compact sampler control.
+ * Keeps the existing numeric value and change callback unchanged.
+ */
+const ThemedSlider: React.FC<Props> = ({
     label,
     value,
     onValueChange,
@@ -30,104 +34,106 @@ const ThemedSlider: React.FC<ThemedSliderProps> = ({
     showInput = true,
     disabled = false,
 }) => {
-    const styles = useStyles()
     const { color } = Theme.useTheme()
-    const [textValue, setTextValue] = useState(value.toString())
+    const [textValue, setTextValue] = useState(String(value))
+    const [editing, setEditing] = useState(false)
 
-    const clampSlider = useCallback(
-        (value: number) => clamp(value, min, max, precision),
+    useEffect(() => {
+        if (!editing) setTextValue(String(value))
+    }, [value, editing])
+
+    const normalize = useCallback(
+        (v: number) => clamp(v, min, max, precision),
         [min, max, precision]
     )
 
-    const handleSliderChange = (v: number) => {
-        if (!isNaN(clampSlider(v))) onValueChange(clampSlider(v))
-        setTextValue(clampSlider(v).toString())
+    const handleSlider = (v: number) => {
+        const parsed = normalize(v)
+        if (Number.isFinite(parsed)) {
+            onValueChange(parsed)
+            setTextValue(String(parsed))
+        }
     }
-
-    const handleTextInputChange = (t: string) => {
-        let v = 0
-        setTextValue(t)
-        v = parseFloat(t)
-        if (!isNaN(v)) onValueChange(clampSlider(v))
-    }
-
-    const handleEndEdit = () => {
-        const v = parseFloat(textValue)
-        if (!isNaN(v)) onValueChange(clamp(v, min, max, precision))
-        setTextValue(clampSlider(value).toString())
+    const commitInput = () => {
+        const parsed = Number(textValue.trim())
+        if (Number.isFinite(parsed)) {
+            const next = normalize(parsed)
+            onValueChange(next)
+            setTextValue(String(next))
+        } else {
+            setTextValue(String(value))
+        }
+        setEditing(false)
     }
 
     return (
-        <View style={{ alignItems: `center` }}>
-            {label && (
-                <Text style={disabled ? styles.itemNameDisabled : styles.itemName}>{label}</Text>
-            )}
-            <View style={styles.sliderContainer}>
-                <Slider
-                    disabled={disabled}
-                    style={styles.slider}
-                    step={step}
-                    minimumValue={min}
-                    maximumValue={max}
-                    value={value}
-                    onSlidingComplete={handleSliderChange}
-                    minimumTrackTintColor={color.primary._400}
-                    maximumTrackTintColor={color.neutral._600}
-                    thumbTintColor={color.primary._500}
-                />
-                {showInput && (
+        <View style={{
+            borderRadius: 14,
+            borderWidth: 1,
+            borderColor: disabled ? color.neutral._400 : '#423249',
+            backgroundColor: '#1E1827',
+            paddingHorizontal: 13,
+            paddingTop: 11,
+            paddingBottom: 9,
+            opacity: disabled ? 0.55 : 1,
+        }}>
+            <View style={{
+                flexDirection: 'row', alignItems: 'center',
+                justifyContent: 'space-between', columnGap: 9,
+            }}>
+                <Text style={{
+                    flex: 1, fontSize: 13, fontWeight: '700',
+                    color: color.text._200,
+                }}>
+                    {label}
+                </Text>
+                {showInput ? (
                     <TextInput
                         editable={!disabled}
-                        style={[
-                            styles.textBox,
-                            {
-                                flex: value > 999999 ? 2 : 1.5,
-                                borderColor: disabled ? color.neutral._700 : color.neutral._400,
-                            },
-                        ]}
+                        accessibilityLabel={label + ' value'}
+                        keyboardType={precision > 0 ? 'decimal-pad' : 'number-pad'}
+                        selectTextOnFocus
+                        style={{
+                            minWidth: 73, maxWidth: 115,
+                            minHeight: 37, paddingVertical: 5,
+                            paddingHorizontal: 10, textAlign: 'center',
+                            color: '#F8F3FA', fontSize: 14, fontWeight: '800',
+                            borderWidth: 1, borderColor: editing ? '#D552A3' : '#594064',
+                            borderRadius: 10, backgroundColor: '#2C2037',
+                        }}
                         value={textValue}
-                        onChangeText={handleTextInputChange}
-                        keyboardType="number-pad"
-                        submitBehavior="blurAndSubmit"
-                        multiline
-                        numberOfLines={1}
-                        onEndEditing={handleEndEdit}
-                        onSubmitEditing={handleEndEdit}
-                        onBlur={handleEndEdit}
+                        onChangeText={(text) => {
+                            setTextValue(text)
+                            const next = Number(text)
+                            if (text.trim() !== '' && Number.isFinite(next)) {
+                                onValueChange(normalize(next))
+                            }
+                        }}
+                        onFocus={() => setEditing(true)}
+                        onBlur={commitInput}
+                        onSubmitEditing={commitInput}
+                        returnKeyType="done"
                     />
+                ) : (
+                    <Text style={{ color: color.text._100, fontWeight: '800', fontSize: 13 }}>
+                        {value}
+                    </Text>
                 )}
             </View>
+            <Slider
+                disabled={disabled}
+                style={{ height: 32, width: '100%', marginTop: 4 }}
+                minimumValue={min}
+                maximumValue={max}
+                step={step}
+                value={value}
+                onSlidingComplete={handleSlider}
+                minimumTrackTintColor="#D552A3"
+                maximumTrackTintColor="#4D3A59"
+                thumbTintColor="#98E8DE"
+            />
         </View>
     )
 }
 
 export default ThemedSlider
-
-const useStyles = () => {
-    const { color, spacing } = Theme.useTheme()
-    return StyleSheet.create({
-        itemName: {
-            color: color.text._100,
-        },
-
-        itemNameDisabled: {
-            color: color.text._700,
-        },
-
-        sliderContainer: {
-            flexDirection: `row`,
-        },
-
-        slider: {
-            flex: 9,
-            height: 36,
-        },
-
-        textBox: {
-            color: color.text._100,
-            borderWidth: 1,
-            borderRadius: spacing.l,
-            textAlign: `center`,
-        },
-    })
-}
