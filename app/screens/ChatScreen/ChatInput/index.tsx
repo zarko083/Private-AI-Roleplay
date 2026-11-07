@@ -236,7 +236,7 @@ const ChatInput = () => {
                     triggerIconSize={19}
                     triggerStyle={{
                         color: color.text._400,
-                        padding: 8,
+                        padding: 10,
                         backgroundColor: color.neutral._300,
                         borderRadius: 15,
                         opacity: activeProvider ? 1 : 0.5,
@@ -306,7 +306,7 @@ const ChatInput = () => {
                             ? color.neutral._300
                             : nowGenerating
                               ? color.error._500
-                              : color.primary._500,
+                              : color.primary._700,
                     }}
                     onPress={nowGenerating ? abortResponse : handleSend}>
                     <MaterialIcons

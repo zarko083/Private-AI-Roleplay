@@ -70,7 +70,7 @@ const ModelInfoHeader: React.FC<ModelInfoHeaderProps> = ({
                     }}>
                     <AntDesign name={ready ? 'check-circle' : 'database'} size={17} color={ready ? color.primary._800 : color.text._400} />
                 </View>
-                <Text style={{ color: ready ? color.primary._800 : color.text._400, fontSize: 11, letterSpacing: 1, fontWeight: '800', flex: 1 }}>
+                <Text style={{ color: ready ? '#98E8DE' : color.text._400, fontSize: 11, letterSpacing: 1, fontWeight: '800', flex: 1 }}>
                     {label}
                 </Text>
             </View>

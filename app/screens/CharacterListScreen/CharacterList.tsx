@@ -81,7 +81,7 @@ const CharacterList: React.FC = () => {
                     numColumns={2}
                     columnWrapperStyle={{ justifyContent: 'space-between' }}
                     showsVerticalScrollIndicator={false}
-                    contentContainerStyle={{ rowGap: 14, paddingHorizontal: 6, paddingBottom: 36 }}
+                    contentContainerStyle={{ rowGap: 14, paddingHorizontal: 6, paddingBottom: 44 }}
                     data={characterList}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={({ item }) => (

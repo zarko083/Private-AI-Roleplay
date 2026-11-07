@@ -166,7 +166,7 @@ const StoryMemorySheet: React.FC<Props> = ({ visible, onClose }) => {
                             <Pressable
                                 accessibilityRole="button"
                                 accessibilityLabel="Close Story Memory"
-                                onPress={onClose}
+                                onPress={requestClose}
                                 style={{ padding: 10 }}>
                                 <Text style={{ color: color.text._300, fontSize: 20 }}>✕</Text>
                             </Pressable>

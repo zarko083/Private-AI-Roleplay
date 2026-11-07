@@ -119,14 +119,11 @@ export namespace Theme {
                         persistedState.useSystemDarkMode = false
                     }
                     if (version < 3) {
-                        // Convert legacy default; user-created themes stay available.
-                        if (!persistedState.color || persistedState.color.name === 'Lavender Dark') {
-                            persistedState.color = DefaultColorSchemes.parcDark
-                            persistedState.useSystemDarkMode = false
-                        }
-                        if (!persistedState.darkColor || persistedState.darkColor.name === 'Lavender Dark') {
-                            persistedState.darkColor = DefaultColorSchemes.parcDark
-                        }
+                        // Apply the official PARC palette on first branded upgrade.
+                        // Keep imported palettes available for later manual selection.
+                        persistedState.color = DefaultColorSchemes.parcDark
+                        persistedState.darkColor = DefaultColorSchemes.parcDark
+                        persistedState.useSystemDarkMode = false
                     }
                     return persistedState
                 },
