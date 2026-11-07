@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router'
-import { Text, TouchableOpacity } from 'react-native'
+import { Text, TouchableOpacity, View } from 'react-native'
 import { useShallow } from 'zustand/react/shallow'
 
 import Avatar from '@components/views/Avatar'
@@ -21,25 +21,41 @@ const UserInfo = () => {
                 router.push('/screens/UserManagerScreen')
             }}
             style={{
+                flexDirection: 'row',
                 alignItems: 'center',
-                columnGap: spacing.l,
-                paddingBottom: spacing.xl,
-                paddingTop: spacing.xl2,
-                padding: spacing.xl,
+                columnGap: 12,
+                marginTop: 15,
+                marginHorizontal: 13,
+                paddingBottom: 15,
+                paddingTop: 10,
+                borderBottomWidth: 1,
+                borderColor: '#493451',
             }}>
             <Avatar
                 targetImage={Characters.getImageDir(imageID)}
                 style={{
-                    width: 80,
-                    height: 80,
+                    width: 52,
+                    height: 52,
                     borderRadius: spacing.xl,
                     borderColor: color.primary._500,
                     borderWidth: borderWidth.m,
-                    marginBottom: spacing.m,
+                    marginBottom: 0,
                 }}
             />
 
-            <Text style={{ fontSize: fontSize.xl, color: color.text._100 }}>{userName}</Text>
+            <View style={{ flex: 1 }}>
+                <Text style={{
+                    color: '#98E8DE', fontSize: 9, letterSpacing: 1.5,
+                    fontWeight: '900',
+                }}>PARC / PROFILE</Text>
+                <Text numberOfLines={1} style={{
+                    fontSize: 17, fontWeight: '800',
+                    marginTop: 5, color: color.text._100,
+                }}>{userName || 'Your persona'}</Text>
+                <Text style={{
+                    color: color.text._500, fontSize: 10, marginTop: 2,
+                }}>Edit your identity ›</Text>
+            </View>
         </TouchableOpacity>
     )
 }

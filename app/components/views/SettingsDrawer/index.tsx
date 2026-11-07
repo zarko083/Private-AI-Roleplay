@@ -21,8 +21,11 @@ const SettingsDrawer = () => {
         <Drawer.Body
             drawerID={Drawer.ID.SETTINGS}
             drawerStyle={{
-                width: '60%',
+                width: '82%',
                 paddingBottom: spacing.xl,
+                backgroundColor: color.neutral._100,
+                borderRightWidth: 1,
+                borderRightColor: '#593765',
             }}>
             <UserInfo />
             <AppModeToggle />

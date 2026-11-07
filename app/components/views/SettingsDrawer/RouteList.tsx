@@ -42,7 +42,9 @@ const DrawerButton = ({ item, index }: DrawerButtonProps) => {
                     }
                 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <AntDesign size={24} name={item.icon ?? 'question'} color={color.text._400} />
+                    <View style={{ width: 35, height: 35, borderRadius: 10, backgroundColor: '#36243F', alignItems: 'center', justifyContent: 'center' }}>
+                        <AntDesign size={18} name={item.icon ?? 'question'} color="#E4ABD8" />
+                    </View>
                     <Text style={styles.largeButtonText}>{item.name}</Text>
                 </View>
                 {Array.isArray(item.path) && (
@@ -86,16 +88,25 @@ const useStyles = () => {
     const { color, spacing, fontSize } = Theme.useTheme()
     return StyleSheet.create({
         largeButtonText: {
-            fontSize: fontSize.xl,
-            paddingVertical: spacing.l,
-            paddingLeft: spacing.xl,
+            fontSize: 13,
+            fontWeight: '700',
+            paddingLeft: 11,
+            flexShrink: 1,
             color: color.text._100,
         },
 
         largeButton: {
-            paddingLeft: spacing.xl,
+            paddingHorizontal: 11,
+            paddingVertical: 8,
+            marginBottom: 5,
+            marginHorizontal: 11,
+            borderWidth: 1,
+            borderColor: '#382840',
+            borderRadius: 12,
+            backgroundColor: '#221A2B',
             flexDirection: 'row',
             alignItems: 'center',
+            minHeight: 52,
             justifyContent: 'space-between',
         },
     })

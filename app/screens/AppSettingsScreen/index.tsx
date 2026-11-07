@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Pressable, Text, View } from 'react-native'
@@ -17,34 +18,62 @@ import ScreenSettings from './ScreenSettings'
 import SecuritySettings from './SecuritySettings'
 import StyleSettings from './StyleSettings'
 
-type SettingsGroupProps = {
+type GroupProps = {
+    number: string
     title: string
     subtitle: string
     children: React.ReactNode
     initiallyOpen?: boolean
 }
 
-/** Collapsible sections keep the original settings controls and storage intact. */
-const SettingsGroup: React.FC<SettingsGroupProps> = ({ title, subtitle, children, initiallyOpen }) => {
-    const [open, setOpen] = useState(Boolean(initiallyOpen))
+const SettingsGroup: React.FC<GroupProps> = ({
+    number, title, subtitle, children, initiallyOpen = false,
+}) => {
+    const [open, setOpen] = useState(initiallyOpen)
     const { color } = Theme.useTheme()
     return (
-        <View style={{ borderRadius: 18, borderWidth: 1, borderColor: color.neutral._400, backgroundColor: color.neutral._200, marginBottom: 10, overflow: 'hidden' }}>
+        <View style={{
+            borderRadius: 18, overflow: 'hidden',
+            borderWidth: 1, borderColor: open ? '#6C3C78' : '#3E2C48',
+            marginBottom: 10, backgroundColor: '#211A2A',
+        }}>
             <Pressable
                 accessibilityRole="button"
-                accessibilityLabel={`${title} settings, ${open ? 'expanded' : 'collapsed'}`}
-                onPress={() => setOpen((value) => !value)}
-                style={{ paddingHorizontal: 16, paddingVertical: 15, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 16, fontWeight: '700', color: color.text._100 }}>{title}</Text>
-                    <Text style={{ fontSize: 12, lineHeight: 17, marginTop: 4, color: color.text._400 }}>{subtitle}</Text>
+                accessibilityLabel={title + (open ? ', collapse' : ', expand')}
+                onPress={() => setOpen((prev) => !prev)}
+                style={{
+                    flexDirection: 'row', alignItems: 'center',
+                    columnGap: 11, minHeight: 73,
+                    paddingHorizontal: 15, paddingVertical: 13,
+                }}>
+                <Text style={{
+                    color: open ? '#98E8DE' : '#A984B7',
+                    fontSize: 12, fontWeight: '900',
+                }}>{number}</Text>
+                <View style={{ flex: 1, minWidth: 0 }}>
+                    <Text style={{
+                        color: color.text._100, fontSize: 15, fontWeight: '800',
+                    }}>{title}</Text>
+                    <Text style={{
+                        color: color.text._400, fontSize: 11, marginTop: 4,
+                    }}>{subtitle}</Text>
                 </View>
-                <Text style={{ color: color.primary._700, fontSize: 19, fontWeight: '600' }}>{open ? '−' : '+'}</Text>
+                <View style={{
+                    width: 30, height: 30, borderRadius: 9,
+                    alignItems: 'center', justifyContent: 'center',
+                    backgroundColor: '#35273F',
+                }}>
+                    <Text style={{ color: '#EBA9D6', fontSize: 18, fontWeight: '700' }}>
+                        {open ? '−' : '+'}
+                    </Text>
+                </View>
             </Pressable>
             {open && (
-                <View style={{ backgroundColor: color.neutral._100, paddingHorizontal: 10, paddingVertical: 10, borderTopWidth: 1, borderTopColor: color.neutral._400 }}>
-                    {children}
-                </View>
+                <View style={{
+                    borderTopWidth: 1, borderColor: '#51365A',
+                    backgroundColor: color.neutral._100,
+                    paddingHorizontal: 13, paddingVertical: 12,
+                }}>{children}</View>
             )}
         </View>
     )
@@ -52,42 +81,84 @@ const SettingsGroup: React.FC<SettingsGroupProps> = ({ title, subtitle, children
 
 const AppSettingsMenu = () => {
     const { t } = useTranslation()
-    const { color, spacing } = Theme.useTheme()
+    const { color } = Theme.useTheme()
+    const router = useRouter()
+
+    const shortcut = (label: string, description: string, action: () => void) => (
+        <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={label}
+            onPress={action}
+            style={{
+                flex: 1, paddingHorizontal: 14, paddingVertical: 14,
+                backgroundColor: '#30203C', borderRadius: 14,
+                borderWidth: 1, borderColor: '#624170',
+            }}>
+            <Text style={{
+                color: '#98E8DE', fontSize: 9, letterSpacing: 1.2, fontWeight: '900',
+            }}>{label}</Text>
+            <Text numberOfLines={2} style={{
+                color: color.text._200, fontSize: 12, marginTop: 5,
+            }}>{description}</Text>
+            <Text style={{ color: '#D552A3', fontSize: 19, marginTop: 2 }}>›</Text>
+        </Pressable>
+    )
+
     return (
         <KeyboardAwareScrollView
-            style={{ paddingHorizontal: spacing.xl, backgroundColor: color.neutral._100 }}
-            contentContainerStyle={{ paddingTop: spacing.xl2, paddingBottom: 44 }}
+            style={{ backgroundColor: color.neutral._100 }}
+            contentContainerStyle={{
+                paddingHorizontal: 16, paddingTop: 16, paddingBottom: 48,
+            }}
             keyboardShouldPersistTaps="handled">
             <HeaderTitle title={t('settings.title')} />
-            <View style={{ paddingHorizontal: 5, paddingTop: 10, paddingBottom: 14 }}>
-                <Text style={{ fontSize: 11, fontWeight: '800', letterSpacing: 1.8, color: color.primary._800 }}>PARC / PERSONAL SPACE</Text>
-                <Text style={{ fontSize: 24, fontWeight: '700', marginTop: 6, color: color.text._100 }}>Your preferences</Text>
-                <Text style={{ fontSize: 13, marginTop: 5, lineHeight: 19, color: color.text._400 }}>
-                    Adjust reading, chat, performance and privacy settings on your device.
-                </Text>
+            <View style={{
+                paddingHorizontal: 4, marginBottom: 19,
+                borderBottomWidth: 1, borderColor: color.neutral._400,
+                paddingBottom: 16,
+            }}>
+                <Text style={{
+                    fontSize: 10, letterSpacing: 2.2, color: '#98E8DE', fontWeight: '900',
+                }}>PARC / CONTROL CENTRE</Text>
+                <Text style={{
+                    fontSize: 27, fontWeight: '900', letterSpacing: -1,
+                    color: color.text._100, marginTop: 9,
+                }}>Make it yours.</Text>
+                <Text style={{
+                    color: color.text._400, fontSize: 12, lineHeight: 18,
+                    marginTop: 6,
+                }}>Manage how PARC reads, writes and runs on this device.</Text>
             </View>
-
-            <SettingsGroup title="Appearance & Reading" subtitle="Colors, display and chat layout" initiallyOpen>
+            <View style={{ flexDirection: 'row', gap: 10, marginBottom: 18 }}>
+                {shortcut('AI ENGINE', 'Local GGUF models', () => router.push('/screens/ModelManagerScreen'))}
+                {shortcut('GENERATION', 'Sampler profiles', () => router.push('/screens/SamplerManagerScreen'))}
+            </View>
+            <Text style={{
+                fontSize: 10, color: color.text._500, letterSpacing: 1.5,
+                fontWeight: '900', marginBottom: 11, marginLeft: 3,
+            }}>PREFERENCES</Text>
+            <SettingsGroup number="01" title="Appearance" subtitle="Colours, reading and layout">
                 <StyleSettings />
                 <ScreenSettings />
                 <ChatWindowSettings />
             </SettingsGroup>
-            <SettingsGroup title="Stories & Characters" subtitle="Chat preferences, character options, generation">
+            <SettingsGroup number="02" title="Stories & Characters" subtitle="Roleplay, user persona and generation">
                 <ChatSettings />
                 <CharacterSettings />
                 <GeneratingSettings />
             </SettingsGroup>
-            <SettingsGroup title="Privacy & Device" subtitle="Security, local storage and notifications">
+            <SettingsGroup number="03" title="Privacy & Device" subtitle="Local storage, security and notifications">
                 <SecuritySettings />
                 <DatabaseSettings />
                 <NotificationSettings />
             </SettingsGroup>
-            <SettingsGroup title="Language" subtitle="Choose your application language">
+            <SettingsGroup number="04" title="Language" subtitle="Application language">
                 <LanguageSettings />
             </SettingsGroup>
-            <Text style={{ textAlign: 'center', color: color.text._500, fontSize: 11, marginTop: 20 }}>
-                PARC · PRIVATE & OFFLINE
-            </Text>
+            <Text style={{
+                textAlign: 'center', marginTop: 18, color: color.text._500,
+                fontSize: 10, letterSpacing: 1.5, fontWeight: '700',
+            }}>PARC / PRIVATE BY DESIGN</Text>
         </KeyboardAwareScrollView>
     )
 }
