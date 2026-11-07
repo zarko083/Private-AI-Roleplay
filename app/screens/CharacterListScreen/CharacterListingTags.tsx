@@ -19,8 +19,9 @@ const CharacterListingTags: React.FC<CharacterListingTagsProps> = ({ tags, onPre
             style={{
                 flexDirection: 'row',
 
-                paddingLeft: 72,
-                paddingRight: 16,
+                paddingLeft: 2,
+                paddingRight: 2,
+                paddingTop: 6,
                 alignItems: 'center',
             }}>
             <View
@@ -37,7 +38,7 @@ const CharacterListingTags: React.FC<CharacterListingTagsProps> = ({ tags, onPre
                         <Text
                             style={{
                                 color: color.text._200,
-                                fontSize: fontSize.m,
+                                fontSize: fontSize.s,
                                 borderWidth: 1,
                                 borderColor: color.primary._200,
                                 backgroundColor: color.primary._100,
