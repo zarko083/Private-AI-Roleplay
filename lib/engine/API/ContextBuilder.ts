@@ -15,7 +15,11 @@ import { Macro } from '@lib/utils/Macros'
 
 import { APIConfiguration, APIValues } from './APIBuilder.types'
 import { formatPinnedMemoryPrompt } from './PinnedMemory'
-import { formatIncludedNamesBlock, formatSpeakerPrefix } from './NameContext'
+import {
+    formatIncludedNamesBlock,
+    formatSpeakerPrefix,
+    stripLeadingSpeakerPrefix,
+} from './NameContext'
 import { formatRoleplayStyleBlock } from './RoleplayStyle'
 import type { DataSource, DataSourceResult } from '../DataSources/types'
 
@@ -168,7 +172,11 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
             : ''
 
         const speakerName = message.is_user ? user?.name : character?.name
-        const name = includeNames ? formatSpeakerPrefix(speakerName || message.name) : ''
+        // Structured chat messages already carry a role, so do not prepend speaker labels.
+        // Keep labels only for plain-text completion templates needing explicit speakers.
+        const name = includeNames && mode === 'text'
+            ? formatSpeakerPrefix(speakerName || message.name)
+            : ''
 
         const timestampLen = instruct.timestamp ? await tokenizer(timestamp) : 0
         const nameLen = name ? await tokenizer(name) : 0
@@ -193,7 +201,10 @@ export const collectContext = async (params: ContextBuilderParams & { mode: 'cha
 
         const role: 'user' | 'assistant' = message.is_user ? 'user' : 'assistant'
 
-        const content = replaceMacrosInternal(`${timestamp}${name}${swipe.swipe}`, instruct)
+        const messageText = message.is_user
+            ? swipe.swipe
+            : stripLeadingSpeakerPrefix(swipe.swipe, speakerName || message.name)
+        const content = replaceMacrosInternal(`${timestamp}${name}${messageText}`, instruct)
 
         let attachments: ContentTypes[] | undefined
 
