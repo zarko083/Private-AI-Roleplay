@@ -30,6 +30,34 @@ export const themeColorSchemaV1 = z.object({
 export type ThemeColor = z.infer<typeof themeColorSchemaV1>
 
 export namespace DefaultColorSchemes {
+    /** PARC: brand #542177, #8E1EA2, #D552A3, mint #98E8DE. */
+    export const parcDark: ThemeColor = {
+        version: 1,
+        name: 'PARC Dark',
+        primary: {
+            _100: '#321744', _200: '#542177', _300: '#6F278A',
+            _400: '#8E1EA2', _500: '#AA38AB', _600: '#C349AF',
+            _700: '#D552A3', _800: '#E99ACC', _900: '#F7DCF0',
+        },
+        neutral: {
+            _100: '#100D17', _200: '#211B2B', _300: '#32263D',
+            _400: '#483653', _500: '#66546F', _600: '#867390',
+            _700: '#A697AD', _800: '#C8BBCD', _900: '#E7DAEB',
+        },
+        error: {
+            _100: '#FFB7BA', _200: '#FF979F', _300: '#F1748A',
+            _400: '#DB526E', _500: '#B93758', _600: '#982843',
+            _700: '#752034', _800: '#511A28', _900: '#32141C',
+        },
+        text: {
+            _100: '#F8F3FA', _200: '#EBDFF0', _300: '#D8CBDD',
+            _400: '#B8A9C3', _500: '#9587A2', _600: '#776980',
+            _700: '#5C4C66', _800: '#40334A', _900: '#1A1422',
+        },
+        quote: '#E99ACC',
+        shadow: '#08060D',
+    }
+
     export const lavenderDark: ThemeColor = {
         version: 1,
         name: 'Lavender Dark',
@@ -336,5 +364,5 @@ export namespace DefaultColorSchemes {
         shadow: '#000000',
     }
 
-    export const schemes = [lavenderDark, lavenderLight, amoled, navyDark, hotPink, retroGreen]
+    export const schemes = [parcDark, lavenderDark, lavenderLight, amoled, navyDark, hotPink, retroGreen]
 }

@@ -10,7 +10,7 @@ import { Theme } from '@lib/theme/ThemeManager'
 
 import StoryMemorySheet from './StoryMemorySheet'
 
-/** Presentation only. Model loading and inference remain owned by ChatterUI. */
+/** PARC identity header. The original local inference engine remains unchanged. */
 const ChatIdentityBar = () => {
     const { color } = Theme.useTheme()
     const router = useRouter()
@@ -38,7 +38,7 @@ const ChatIdentityBar = () => {
                 paddingVertical: 9,
                 borderRadius: 18,
                 borderWidth: 1,
-                borderColor: color.neutral._400,
+                borderColor: color.primary._200,
                 backgroundColor: color.neutral._200,
                 flexDirection: 'row',
                 alignItems: 'center',
@@ -96,7 +96,7 @@ const ChatIdentityBar = () => {
                         fontWeight: '700',
                         fontSize: 9,
                         lineHeight: 12,
-                        color: available ? color.primary._900 : color.text._400,
+                        color: available ? '#98E8DE' : color.text._400,
                     }}>
                     {status}
                 </Text>

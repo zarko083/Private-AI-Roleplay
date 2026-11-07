@@ -39,7 +39,7 @@ const ModelManagerScreen = () => {
         <SafeAreaView
             edges={['bottom']}
             style={{ paddingTop: spacing.l, paddingHorizontal: spacing.xl, paddingBottom: spacing.xl, flex: 1, backgroundColor: color.neutral._100 }}>
-            <HeaderTitle title={showSettings ? 'Model Configuration' : 'Local AI Models'} />
+            <HeaderTitle title={showSettings ? 'Model Settings' : 'PARC Local Models'} />
             <HeaderButton
                 headerRight={() =>
                     !showSettings && (
@@ -53,12 +53,12 @@ const ModelManagerScreen = () => {
                     <ModelInfoHeader
                         modelImporting={modelImporting}
                         modelLoading={modelLoading}
-                        modelListLength={modelList.length}
+                        modelListLength={modelList?.length ?? 0}
                         modelUpdatedAt={modelUpdatedAt}
                     />
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 4, marginTop: 4, marginBottom: 4 }}>
                         <Text style={{ color: color.text._100, fontSize: 14, fontWeight: '700' }}>On-device library</Text>
-                        <Text style={{ color: color.text._500, fontSize: 11 }}>{modelList.length} models</Text>
+                        <Text style={{ color: color.text._500, fontSize: 11 }}>{modelList?.length ?? 0} models</Text>
                     </View>
                     <SectionList
                         style={{ flex: 1, marginTop: 8 }}
@@ -76,7 +76,7 @@ const ModelManagerScreen = () => {
                             />
                         )}
                         renderSectionHeader={({ section: { title, data: sectionData } }) =>
-                            mmprojList.length > 0 ? (
+                            (mmprojList?.length ?? 0) > 0 ? (
                                 <SectionTitle visible={sectionData.length > 0} style={{ marginVertical: 9 }}>
                                     {title}
                                 </SectionTitle>

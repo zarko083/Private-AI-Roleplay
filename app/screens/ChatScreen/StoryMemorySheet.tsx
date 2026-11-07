@@ -138,7 +138,7 @@ const StoryMemorySheet: React.FC<Props> = ({ visible, onClose }) => {
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                             <View style={{ flex: 1, paddingRight: 8 }}>
                                 <Text style={{ color: color.primary._800, fontSize: 11, letterSpacing: 2, fontWeight: '800' }}>
-                                    PRIVATE ROLEPLAY · STORY MEMORY
+                                    PARC / MEMORY
                                 </Text>
                                 <Text style={{ color: color.text._100, fontSize: 25, fontWeight: '800', marginTop: 6 }}>
                                     Story Memory
@@ -153,8 +153,8 @@ const StoryMemorySheet: React.FC<Props> = ({ visible, onClose }) => {
                             </Pressable>
                         </View>
                         <Text style={{ color: color.text._400, fontSize: 13, lineHeight: 20, marginTop: 12 }}>
-                            Pin a short list of established facts. They will accompany future AI replies,
-                            even when older chat messages leave the context window.
+                            Save established facts for your story. They accompany future replies,
+                            even after older messages leave context.
                         </Text>
                         <View style={{ flexDirection: 'row', gap: 10, marginTop: 18 }}>
                             {scopeButton('chat', 'This story')}
@@ -201,8 +201,8 @@ const StoryMemorySheet: React.FC<Props> = ({ visible, onClose }) => {
                             </>
                         )}
                         <Text style={{ color: color.text._500, fontSize: 12, lineHeight: 18, marginTop: 12 }}>
-                            Manual memory only. Saving blank text clears the selected memory. A short
-                            summary protects your 4K context budget and keeps local generation responsive.
+                            Saved locally. Clearing this text removes the selected memory. Keep facts short
+                            to preserve context for the conversation.
                         </Text>
                         {message ? (
                             <Text style={{ color: color.primary._800, fontSize: 12, marginTop: 10 }}>

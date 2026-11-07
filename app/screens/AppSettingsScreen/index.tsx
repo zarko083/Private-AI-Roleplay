@@ -60,10 +60,10 @@ const AppSettingsMenu = () => {
             keyboardShouldPersistTaps="handled">
             <HeaderTitle title={t('settings.title')} />
             <View style={{ paddingHorizontal: 5, paddingTop: 10, paddingBottom: 14 }}>
-                <Text style={{ fontSize: 11, fontWeight: '800', letterSpacing: 1.8, color: color.primary._800 }}>PRIVATE ROLEPLAY</Text>
-                <Text style={{ fontSize: 24, fontWeight: '700', marginTop: 6, color: color.text._100 }}>Make the world yours</Text>
+                <Text style={{ fontSize: 11, fontWeight: '800', letterSpacing: 1.8, color: color.primary._800 }}>PARC / PERSONAL SPACE</Text>
+                <Text style={{ fontSize: 24, fontWeight: '700', marginTop: 6, color: color.text._100 }}>Your preferences</Text>
                 <Text style={{ fontSize: 13, marginTop: 5, lineHeight: 19, color: color.text._400 }}>
-                    Customize your reading, writing, and privacy preferences. Tap a section to expand.
+                    Adjust reading, chat, performance and privacy settings on your device.
                 </Text>
             </View>
 
@@ -86,7 +86,7 @@ const AppSettingsMenu = () => {
                 <LanguageSettings />
             </SettingsGroup>
             <Text style={{ textAlign: 'center', color: color.text._500, fontSize: 11, marginTop: 20 }}>
-                Private Roleplay · Offline Edition
+                PARC · PRIVATE & OFFLINE
             </Text>
         </KeyboardAwareScrollView>
     )

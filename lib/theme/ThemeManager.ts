@@ -34,9 +34,9 @@ export namespace Theme {
     export const useColorState = create<ColorStateProps>()(
         persist(
             (set, get) => ({
-                useSystemDarkMode: true,
-                color: DefaultColorSchemes.lavenderDark,
-                darkColor: DefaultColorSchemes.lavenderDark,
+                useSystemDarkMode: false,
+                color: DefaultColorSchemes.parcDark,
+                darkColor: DefaultColorSchemes.parcDark,
                 lightColor: DefaultColorSchemes.lavenderLight,
                 setColor: (color) => {
                     set({ color: color })
@@ -87,11 +87,11 @@ export namespace Theme {
                     let lightColor = get().lightColor
                     let darkColor = get().darkColor
                     if (removed) {
-                        if (removed.name === color.name) color = DefaultColorSchemes.lavenderDark
+                        if (removed.name === color.name) color = DefaultColorSchemes.parcDark
                         if (removed.name === lightColor.name)
                             lightColor = DefaultColorSchemes.lavenderLight
                         if (removed.name === darkColor.name)
-                            darkColor = DefaultColorSchemes.lavenderDark
+                            darkColor = DefaultColorSchemes.parcDark
                     }
                     set({
                         customColors: colors,
@@ -104,7 +104,7 @@ export namespace Theme {
             {
                 name: Storage.ColorState,
                 storage: createMMKVStorage(),
-                version: 2,
+                version: 3,
                 partialize: (state) => ({
                     color: state.color,
                     customColors: state.customColors,
@@ -117,6 +117,16 @@ export namespace Theme {
                         persistedState.darkColor = DefaultColorSchemes.lavenderDark
                         persistedState.lightColor = DefaultColorSchemes.lavenderLight
                         persistedState.useSystemDarkMode = false
+                    }
+                    if (version < 3) {
+                        // Convert legacy default; user-created themes stay available.
+                        if (!persistedState.color || persistedState.color.name === 'Lavender Dark') {
+                            persistedState.color = DefaultColorSchemes.parcDark
+                            persistedState.useSystemDarkMode = false
+                        }
+                        if (!persistedState.darkColor || persistedState.darkColor.name === 'Lavender Dark') {
+                            persistedState.darkColor = DefaultColorSchemes.parcDark
+                        }
                     }
                     return persistedState
                 },
