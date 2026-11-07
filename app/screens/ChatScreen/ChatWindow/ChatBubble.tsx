@@ -65,9 +65,16 @@ const ChatBubble: React.FC<ChatTextProps> = ({
                     borderRadius: 9,
                 }}>
                 {isLastMessage ? (
-                    <ChatTextLast nowGenerating={nowGenerating} swipe={swipe} />
+                    <ChatTextLast
+                        nowGenerating={nowGenerating}
+                        swipe={swipe}
+                        speakerName={entry.is_user ? undefined : entry.name}
+                    />
                 ) : (
-                    <ChatText swipeText={swipe.swipe} />
+                    <ChatText
+                        swipeText={swipe.swipe}
+                        speakerName={entry.is_user ? undefined : entry.name}
+                    />
                 )}
                 <ChatAttachments entry={entry} />
                 <View style={{ flexDirection: 'row' }}>
